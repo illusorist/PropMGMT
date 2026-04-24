@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Owner> Owners => Set<Owner>();
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<Amenity> Amenities => Set<Amenity>();
+    public DbSet<PropertyAmenity> PropertyAmenities => Set<PropertyAmenity>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Payment> Payments => Set<Payment>();
@@ -30,6 +32,24 @@ public class AppDbContext : DbContext
             .Property(c => c.Status).HasConversion<string>();
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status).HasConversion<string>();
+
+        modelBuilder.Entity<Amenity>()
+            .Property(a => a.Name).IsRequired();
+        modelBuilder.Entity<Amenity>()
+            .Property(a => a.NormalizedName).IsRequired();
+        modelBuilder.Entity<Amenity>()
+            .HasIndex(a => a.NormalizedName).IsUnique();
+
+        modelBuilder.Entity<PropertyAmenity>()
+            .HasKey(pa => new { pa.PropertyId, pa.AmenityId });
+        modelBuilder.Entity<PropertyAmenity>()
+            .HasOne(pa => pa.Property)
+            .WithMany(p => p.PropertyAmenities)
+            .HasForeignKey(pa => pa.PropertyId);
+        modelBuilder.Entity<PropertyAmenity>()
+            .HasOne(pa => pa.Amenity)
+            .WithMany(a => a.PropertyAmenities)
+            .HasForeignKey(pa => pa.AmenityId);
 
         modelBuilder.Entity<User>().HasData(new User
         {

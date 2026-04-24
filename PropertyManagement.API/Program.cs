@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+builder.Services.AddScoped<IAmenityRepository, AmenityRepository>();
 builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
@@ -23,6 +24,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<OwnerService>();
 builder.Services.AddScoped<PropertyService>();
+builder.Services.AddScoped<AmenityService>();
 builder.Services.AddScoped<TenantService>();
 builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<PaymentService>();

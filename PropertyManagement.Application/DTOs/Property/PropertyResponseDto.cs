@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using PropertyManagement.Application.DTOs.Amenity;
+
 namespace PropertyManagement.Application.DTOs.Property;
 
 public class PropertyResponseDto
@@ -8,4 +11,5 @@ public class PropertyResponseDto
     public string Address { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public List<AmenityResponseDto> Amenities { get; set; } = new();
 }

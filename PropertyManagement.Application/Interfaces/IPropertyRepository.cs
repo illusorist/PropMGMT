@@ -7,7 +7,9 @@ namespace PropertyManagement.Application.Interfaces;
 public interface IPropertyRepository
 {
     Task<Property?> GetByIdAsync(int id);
+    Task<Property?> GetByIdWithAmenitiesAsync(int id);
     Task<List<Property>> GetAllAsync();
+    Task<List<Property>> GetAllWithAmenitiesAsync();
     Task AddAsync(Property property);
     Task UpdateAsync(Property property);
     Task DeleteAsync(int id);
