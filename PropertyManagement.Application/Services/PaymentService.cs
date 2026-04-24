@@ -44,6 +44,37 @@ public class PaymentService
         };
     }
 
+    public async Task<List<PaymentResponseDto>> GetAllForOwnerAsync(int ownerId)
+    {
+        var payments = await _repo.GetAllByOwnerIdAsync(ownerId);
+        return payments.Select(p => new PaymentResponseDto
+        {
+            Id = p.Id,
+            ContractId = p.ContractId,
+            DueDate = p.DueDate,
+            PaidDate = p.PaidDate,
+            Amount = p.Amount,
+            Status = p.Status,
+            CreatedAt = p.CreatedAt
+        }).ToList();
+    }
+
+    public async Task<PaymentResponseDto?> GetByIdForOwnerAsync(int ownerId, int id)
+    {
+        var p = await _repo.GetByIdByOwnerIdAsync(ownerId, id);
+        if (p == null) return null;
+        return new PaymentResponseDto
+        {
+            Id = p.Id,
+            ContractId = p.ContractId,
+            DueDate = p.DueDate,
+            PaidDate = p.PaidDate,
+            Amount = p.Amount,
+            Status = p.Status,
+            CreatedAt = p.CreatedAt
+        };
+    }
+
     public async Task CreateAsync(PaymentCreateDto dto)
     {
         var payment = new Payment

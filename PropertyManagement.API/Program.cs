@@ -23,6 +23,7 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<OwnerService>();
+builder.Services.AddScoped<OwnerAccountService>();
 builder.Services.AddScoped<PropertyService>();
 builder.Services.AddScoped<AmenityService>();
 builder.Services.AddScoped<TenantService>();

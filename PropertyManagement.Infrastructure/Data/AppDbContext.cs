@@ -51,6 +51,14 @@ public class AppDbContext : DbContext
             .WithMany(a => a.PropertyAmenities)
             .HasForeignKey(pa => pa.AmenityId);
 
+        modelBuilder.Entity<Owner>()
+            .HasOne(o => o.User)
+            .WithOne()
+            .HasForeignKey<Owner>(o => o.UserId);
+        modelBuilder.Entity<Owner>()
+            .HasIndex(o => o.UserId)
+            .IsUnique();
+
         modelBuilder.Entity<User>().HasData(new User
         {
             // TODO : Change this password hash to a more secure one before production

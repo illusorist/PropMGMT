@@ -46,6 +46,39 @@ public class ContractService
         };
     }
 
+    public async Task<List<ContractResponseDto>> GetAllForOwnerAsync(int ownerId)
+    {
+        var contracts = await _repo.GetAllByOwnerIdAsync(ownerId);
+        return contracts.Select(c => new ContractResponseDto
+        {
+            Id = c.Id,
+            PropertyId = c.PropertyId,
+            TenantId = c.TenantId,
+            StartDate = c.StartDate,
+            EndDate = c.EndDate,
+            MonthlyRent = c.MonthlyRent,
+            Status = c.Status,
+            CreatedAt = c.CreatedAt
+        }).ToList();
+    }
+
+    public async Task<ContractResponseDto?> GetByIdForOwnerAsync(int ownerId, int id)
+    {
+        var c = await _repo.GetByIdByOwnerIdAsync(ownerId, id);
+        if (c == null) return null;
+        return new ContractResponseDto
+        {
+            Id = c.Id,
+            PropertyId = c.PropertyId,
+            TenantId = c.TenantId,
+            StartDate = c.StartDate,
+            EndDate = c.EndDate,
+            MonthlyRent = c.MonthlyRent,
+            Status = c.Status,
+            CreatedAt = c.CreatedAt
+        };
+    }
+
     public async Task CreateAsync(ContractCreateDto dto)
     {
         var contract = new Contract

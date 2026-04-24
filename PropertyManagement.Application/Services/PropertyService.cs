@@ -51,6 +51,37 @@ public class PropertyService
         };
     }
 
+    public async Task<List<PropertyResponseDto>> GetAllForOwnerAsync(int ownerId)
+    {
+        var properties = await _repo.GetAllWithAmenitiesByOwnerIdAsync(ownerId);
+        return properties.Select(p => new PropertyResponseDto
+        {
+            Id = p.Id,
+            OwnerId = p.OwnerId,
+            Name = p.Name,
+            Address = p.Address,
+            Type = p.Type,
+            CreatedAt = p.CreatedAt,
+            Amenities = MapAmenities(p)
+        }).ToList();
+    }
+
+    public async Task<PropertyResponseDto?> GetByIdForOwnerAsync(int ownerId, int id)
+    {
+        var p = await _repo.GetByIdWithAmenitiesByOwnerIdAsync(ownerId, id);
+        if (p == null) return null;
+        return new PropertyResponseDto
+        {
+            Id = p.Id,
+            OwnerId = p.OwnerId,
+            Name = p.Name,
+            Address = p.Address,
+            Type = p.Type,
+            CreatedAt = p.CreatedAt,
+            Amenities = MapAmenities(p)
+        };
+    }
+
     public async Task CreateAsync(PropertyCreateDto dto)
     {
         var amenityIds = NormalizeAmenityIds(dto.AmenityIds);
@@ -58,6 +89,24 @@ public class PropertyService
         var property = new Property
         {
             OwnerId = dto.OwnerId,
+            Name = dto.Name,
+            Address = dto.Address,
+            Type = dto.Type,
+            PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
+            {
+                AmenityId = id
+            }).ToList()
+        };
+        await _repo.AddAsync(property);
+    }
+
+    public async Task CreateForOwnerAsync(int ownerId, PropertyCreateDto dto)
+    {
+        var amenityIds = NormalizeAmenityIds(dto.AmenityIds);
+        await EnsureAmenitiesExistAsync(amenityIds);
+        var property = new Property
+        {
+            OwnerId = ownerId,
             Name = dto.Name,
             Address = dto.Address,
             Type = dto.Type,
@@ -90,6 +139,35 @@ public class PropertyService
             });
         }
         await _repo.UpdateAsync(property);
+    }
+
+    public async Task UpdateForOwnerAsync(int ownerId, int id, PropertyCreateDto dto)
+    {
+        var property = await _repo.GetByIdWithAmenitiesByOwnerIdAsync(ownerId, id)
+            ?? throw new KeyNotFoundException($"Property {id} not found");
+        var amenityIds = NormalizeAmenityIds(dto.AmenityIds);
+        await EnsureAmenitiesExistAsync(amenityIds);
+        property.Name = dto.Name;
+        property.Address = dto.Address;
+        property.Type = dto.Type;
+        property.UpdatedAt = DateTime.UtcNow;
+        property.PropertyAmenities.Clear();
+        foreach (var amenityId in amenityIds)
+        {
+            property.PropertyAmenities.Add(new PropertyAmenity
+            {
+                PropertyId = property.Id,
+                AmenityId = amenityId
+            });
+        }
+        await _repo.UpdateAsync(property);
+    }
+
+    public async Task DeleteForOwnerAsync(int ownerId, int id)
+    {
+        var property = await _repo.GetByIdWithAmenitiesByOwnerIdAsync(ownerId, id)
+            ?? throw new KeyNotFoundException($"Property {id} not found");
+        await _repo.DeleteAsync(property.Id);
     }
 
     public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
