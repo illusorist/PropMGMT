@@ -19,7 +19,7 @@ public class ContractService
         return contracts.Select(c => new ContractResponseDto
         {
             Id = c.Id,
-            UnitId = c.UnitId,
+            PropertyId = c.PropertyId,
             TenantId = c.TenantId,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
@@ -36,7 +36,7 @@ public class ContractService
         return new ContractResponseDto
         {
             Id = c.Id,
-            UnitId = c.UnitId,
+            PropertyId = c.PropertyId,
             TenantId = c.TenantId,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
@@ -50,7 +50,7 @@ public class ContractService
     {
         var contract = new Contract
         {
-            UnitId = dto.UnitId,
+            PropertyId = dto.PropertyId,
             TenantId = dto.TenantId,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
@@ -64,7 +64,7 @@ public class ContractService
     {
         var contract = await _repo.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Contract {id} not found");
-        contract.UnitId = dto.UnitId;
+        contract.PropertyId = dto.PropertyId;
         contract.TenantId = dto.TenantId;
         contract.StartDate = dto.StartDate;
         contract.EndDate = dto.EndDate;

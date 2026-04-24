@@ -11,7 +11,6 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Owner> Owners => Set<Owner>();
     public DbSet<Property> Properties => Set<Property>();
-    public DbSet<Unit> Units => Set<Unit>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Payment> Payments => Set<Payment>();
@@ -22,18 +21,11 @@ public class AppDbContext : DbContext
     {
         //TODO : Configure Relationships and Constraints
         
-
-        modelBuilder.Entity<Unit>()
-            .Property(u => u.BaseRent).HasColumnType("numeric(18,2)");
-        modelBuilder.Entity<Unit>()
-            .Property(u => u.Area).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Contract>()
             .Property(c => c.MonthlyRent).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Payment>()
             .Property(p => p.Amount).HasColumnType("numeric(18,2)");
 
-        modelBuilder.Entity<Unit>()
-            .Property(u => u.Status).HasConversion<string>();
         modelBuilder.Entity<Contract>()
             .Property(c => c.Status).HasConversion<string>();
         modelBuilder.Entity<Payment>()

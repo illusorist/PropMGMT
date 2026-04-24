@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PropertyManagement.Domain.Entities;
 
 public class Property : BaseEntity
@@ -10,5 +8,4 @@ public class Property : BaseEntity
     public string Type { get; set; } = string.Empty;
 
     public Owner Owner { get; set; } = null!;
-    public ICollection<Unit> Units { get; set; } = new List<Unit>();
 }

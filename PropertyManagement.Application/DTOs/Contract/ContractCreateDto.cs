@@ -5,7 +5,7 @@ namespace PropertyManagement.Application.DTOs.Contract;
 
 public class ContractCreateDto
 {
-    [Required] public int UnitId { get; set; }
+    [Required] public int PropertyId { get; set; }
     [Required] public int TenantId { get; set; }
     [Required] public DateTime StartDate { get; set; }
     [Required] public DateTime EndDate { get; set; }
