@@ -1,0 +1,54 @@
+using System;
+using Microsoft.EntityFrameworkCore;
+using PropertyManagement.Domain.Entities;
+
+namespace PropertyManagement.Infrastructure.Data;
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Owner> Owners => Set<Owner>();
+    public DbSet<Property> Properties => Set<Property>();
+    public DbSet<Unit> Units => Set<Unit>();
+    public DbSet<Tenant> Tenants => Set<Tenant>();
+    public DbSet<Contract> Contracts => Set<Contract>();
+    public DbSet<Payment> Payments => Set<Payment>();
+
+    //TODO : Delete this
+    //    string hash = BCrypt.Net.BCrypt.HashPassword("admin123");
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        //TODO : Configure Relationships and Constraints
+        
+
+        modelBuilder.Entity<Unit>()
+            .Property(u => u.BaseRent).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Unit>()
+            .Property(u => u.Area).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Contract>()
+            .Property(c => c.MonthlyRent).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount).HasColumnType("numeric(18,2)");
+
+        modelBuilder.Entity<Unit>()
+            .Property(u => u.Status).HasConversion<string>();
+        modelBuilder.Entity<Contract>()
+            .Property(c => c.Status).HasConversion<string>();
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Status).HasConversion<string>();
+
+        modelBuilder.Entity<User>().HasData(new User
+        {
+            // TODO : Change this password hash to a more secure one before production
+            // Or really consider implementing a proper user management system with registration, password reset, etc.
+            
+            Id = 1,
+            Username = "admin",
+            PasswordHash = "$2a$12$zxxAdgPh00F5tMWopmrSxebIlwof7p/rFcfDcjhMoM0UaLey9Mr5q",
+            Role = "Admin",
+            CreatedAt = DateTime.SpecifyKind(new DateTime(2026, 4, 20, 0, 0, 0), DateTimeKind.Utc)
+        });
+    }
+}

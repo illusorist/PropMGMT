@@ -52,3 +52,97 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+
+# Internal
+## Build results
+bin/
+obj/
+out/
+
+## Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider / VS Code
+.idea/
+.vscode/
+
+## Logs
+*.log
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+.nuget/
+*.nuget.props
+*.nuget.targets
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## IIS / Web
+wwwroot/uploads/
+wwwroot/temp/
+
+## Publish output
+publish/
+*.publishproj
+*.pubxml
+*.azurePubxml
+
+## Azure
+*.azurePubxml
+
+## Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Environment files
+.env
+.env.*
+
+## Test results
+TestResults/
+*.trx
+
+## Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+## Generated files
+Generated/
+*.g.cs
+*.g.i.cs
+
+## Database files (if local)
+*.mdf
+*.ldf
+
+## Secrets
+secrets.json
+
+## Dotnet CLI
+.dotnet/
+
+## Temporary files
+*.tmp
+*.temp
+
+## Misc
+Misc/
