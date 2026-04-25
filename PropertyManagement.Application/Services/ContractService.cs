@@ -21,6 +21,7 @@ public class ContractService
             Id = c.Id,
             PropertyId = c.PropertyId,
             TenantId = c.TenantId,
+            DeedNumber = c.DeedNumber,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
             MonthlyRent = c.MonthlyRent,
@@ -38,6 +39,7 @@ public class ContractService
             Id = c.Id,
             PropertyId = c.PropertyId,
             TenantId = c.TenantId,
+            DeedNumber = c.DeedNumber,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
             MonthlyRent = c.MonthlyRent,
@@ -54,6 +56,7 @@ public class ContractService
             Id = c.Id,
             PropertyId = c.PropertyId,
             TenantId = c.TenantId,
+            DeedNumber = c.DeedNumber,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
             MonthlyRent = c.MonthlyRent,
@@ -71,6 +74,7 @@ public class ContractService
             Id = c.Id,
             PropertyId = c.PropertyId,
             TenantId = c.TenantId,
+            DeedNumber = c.DeedNumber,
             StartDate = c.StartDate,
             EndDate = c.EndDate,
             MonthlyRent = c.MonthlyRent,
@@ -85,6 +89,7 @@ public class ContractService
         {
             PropertyId = dto.PropertyId,
             TenantId = dto.TenantId,
+            DeedNumber = dto.DeedNumber,
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
             MonthlyRent = dto.MonthlyRent,
@@ -99,6 +104,7 @@ public class ContractService
             ?? throw new KeyNotFoundException($"Contract {id} not found");
         contract.PropertyId = dto.PropertyId;
         contract.TenantId = dto.TenantId;
+        contract.DeedNumber = dto.DeedNumber;
         contract.StartDate = dto.StartDate;
         contract.EndDate = dto.EndDate;
         contract.MonthlyRent = dto.MonthlyRent;

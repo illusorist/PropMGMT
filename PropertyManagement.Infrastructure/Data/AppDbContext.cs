@@ -1,6 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Domain.Entities;
+using PropertyManagement.Domain.Enums;
 
 namespace PropertyManagement.Infrastructure.Data;
 
@@ -30,6 +31,10 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Contract>()
             .Property(c => c.Status).HasConversion<string>();
+        modelBuilder.Entity<Property>()
+            .Property(p => p.Status)
+            .HasConversion<string>()
+            .HasDefaultValue(PropertyStatus.Pending);
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status).HasConversion<string>();
 

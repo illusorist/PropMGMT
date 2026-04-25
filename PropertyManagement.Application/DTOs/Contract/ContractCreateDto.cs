@@ -7,6 +7,7 @@ public class ContractCreateDto
 {
     [Required] public int PropertyId { get; set; }
     [Required] public int TenantId { get; set; }
+    [Required] public string DeedNumber { get; set; } = string.Empty;
     [Required] public DateTime StartDate { get; set; }
     [Required] public DateTime EndDate { get; set; }
     [Required] public decimal MonthlyRent { get; set; }

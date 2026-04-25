@@ -14,11 +14,13 @@ public class OwnersController : ControllerBase
 {
     private readonly OwnerService _service;
     private readonly OwnerAccountService _accountService;
+    private readonly OwnerStatsService _statsService;
 
-    public OwnersController(OwnerService service, OwnerAccountService accountService)
+    public OwnersController(OwnerService service, OwnerAccountService accountService, OwnerStatsService statsService)
     {
         _service = service;
         _accountService = accountService;
+        _statsService = statsService;
     }
 
     [HttpGet]
@@ -74,5 +76,17 @@ public class OwnersController : ControllerBase
         if (!User.IsAdminOrAgencyOwner()) return Forbid();
         await _accountService.CreateAccountAsync(id, dto);
         return NoContent();
+    }
+
+    [HttpGet("{id}/stats")]
+    public async Task<IActionResult> GetStats(int id)
+    {
+        if (User.IsOwnerClient())
+        {
+            var ownerId = User.GetOwnerId();
+            if (!ownerId.HasValue || ownerId.Value != id) return Forbid();
+        }
+        if (!User.IsOwnerClient() && !User.IsAdminOrAgencyOwner()) return Forbid();
+        return Ok(await _statsService.GetStatsAsync(id));
     }
 }

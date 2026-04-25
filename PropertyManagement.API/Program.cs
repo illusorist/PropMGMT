@@ -24,12 +24,14 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<OwnerService>();
 builder.Services.AddScoped<OwnerAccountService>();
+builder.Services.AddScoped<OwnerStatsService>();
 builder.Services.AddScoped<PropertyService>();
 builder.Services.AddScoped<AmenityService>();
 builder.Services.AddScoped<TenantService>();
 builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserAccountService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

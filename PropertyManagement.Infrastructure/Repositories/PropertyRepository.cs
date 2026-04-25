@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Domain.Entities;
+using PropertyManagement.Domain.Enums;
 using PropertyManagement.Infrastructure.Data;
 
 namespace PropertyManagement.Infrastructure.Repositories;
@@ -44,6 +45,12 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
             .Where(p => p.OwnerId == ownerId)
             .ToListAsync();
     }
+
+    public async Task<int> CountByOwnerAsync(int ownerId)
+        => await _db.Properties.CountAsync(p => p.OwnerId == ownerId);
+
+    public async Task<int> CountByOwnerAndStatusAsync(int ownerId, PropertyStatus status)
+        => await _db.Properties.CountAsync(p => p.OwnerId == ownerId && p.Status == status);
 
     public override async Task UpdateAsync(Property property)
     {

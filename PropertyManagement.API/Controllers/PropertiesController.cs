@@ -83,4 +83,12 @@ public class PropertiesController : ControllerBase
         }
         return NoContent();
     }
+
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> UpdateStatus(int id, PropertyStatusUpdateDto dto)
+    {
+        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        await _service.UpdateStatusAsync(id, dto.Status);
+        return NoContent();
+    }
 }

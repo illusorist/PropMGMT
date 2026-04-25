@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PropertyManagement.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PropertyManagement.Infrastructure.Data;
 namespace PropertyManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260424230220_AddPropertyStatus")]
+    partial class AddPropertyStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,10 +69,6 @@ namespace PropertyManagement.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("DeedNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -204,9 +203,7 @@ namespace PropertyManagement.Infrastructure.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("Pending");
+                        .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .IsRequired()

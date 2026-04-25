@@ -6,6 +6,7 @@ using PropertyManagement.Application.DTOs.Amenity;
 using PropertyManagement.Application.DTOs.Property;
 using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Domain.Entities;
+using PropertyManagement.Domain.Enums;
 
 namespace PropertyManagement.Application.Services;
 
@@ -30,6 +31,7 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
         }).ToList();
@@ -46,6 +48,7 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
         };
@@ -61,6 +64,7 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
         }).ToList();
@@ -77,6 +81,7 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
         };
@@ -168,6 +173,15 @@ public class PropertyService
         var property = await _repo.GetByIdWithAmenitiesByOwnerIdAsync(ownerId, id)
             ?? throw new KeyNotFoundException($"Property {id} not found");
         await _repo.DeleteAsync(property.Id);
+    }
+
+    public async Task UpdateStatusAsync(int id, PropertyStatus status)
+    {
+        var property = await _repo.GetByIdWithAmenitiesAsync(id)
+            ?? throw new KeyNotFoundException($"Property {id} not found");
+        property.Status = status;
+        property.UpdatedAt = DateTime.UtcNow;
+        await _repo.UpdateAsync(property);
     }
 
     public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
