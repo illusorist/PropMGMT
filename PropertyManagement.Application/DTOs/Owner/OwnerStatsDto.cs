@@ -9,6 +9,7 @@ public class OwnerStatsDto
     public int PendingProperties { get; set; }
     public int ApprovedProperties { get; set; }
     public int RejectedProperties { get; set; }
+    public int SoldProperties { get; set; }
     public int TotalContracts { get; set; }
     public int ActiveContracts { get; set; }
     public int PendingContracts { get; set; }

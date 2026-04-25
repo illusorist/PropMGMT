@@ -25,6 +25,7 @@ public class OwnerStatsService
             PendingProperties = await _propertyRepo.CountByOwnerAndStatusAsync(ownerId, PropertyStatus.Pending),
             ApprovedProperties = await _propertyRepo.CountByOwnerAndStatusAsync(ownerId, PropertyStatus.Approved),
             RejectedProperties = await _propertyRepo.CountByOwnerAndStatusAsync(ownerId, PropertyStatus.Rejected),
+            SoldProperties = await _propertyRepo.CountByOwnerAndStatusAsync(ownerId, PropertyStatus.Sold),
             TotalContracts = await _contractRepo.CountByOwnerAsync(ownerId),
             ActiveContracts = await _contractRepo.CountByOwnerAndStatusAsync(ownerId, ContractStatus.Active),
             PendingContracts = await _contractRepo.CountByOwnerAndStatusAsync(ownerId, ContractStatus.Pending),

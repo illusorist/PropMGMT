@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Owner> Owners => Set<Owner>();
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<BuyerClient> BuyerClients => Set<BuyerClient>();
+    public DbSet<PropertySale> PropertySales => Set<PropertySale>();
     public DbSet<Amenity> Amenities => Set<Amenity>();
     public DbSet<PropertyAmenity> PropertyAmenities => Set<PropertyAmenity>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -26,6 +28,8 @@ public class AppDbContext : DbContext
         
         modelBuilder.Entity<Contract>()
             .Property(c => c.MonthlyRent).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<PropertySale>()
+            .Property(s => s.SalePrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Payment>()
             .Property(p => p.Amount).HasColumnType("numeric(18,2)");
 
@@ -63,6 +67,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Owner>()
             .HasIndex(o => o.UserId)
             .IsUnique();
+
+        modelBuilder.Entity<PropertySale>()
+            .HasOne(s => s.Property)
+            .WithMany(p => p.Sales)
+            .HasForeignKey(s => s.PropertyId);
+        modelBuilder.Entity<PropertySale>()
+            .HasOne(s => s.BuyerClient)
+            .WithMany(b => b.Sales)
+            .HasForeignKey(s => s.BuyerClientId);
 
         modelBuilder.Entity<User>().HasData(new User
         {
