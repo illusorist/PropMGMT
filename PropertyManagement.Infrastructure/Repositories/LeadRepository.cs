@@ -18,6 +18,16 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
         return await _db.Leads
             .Include(l => l.Property)
             .Include(l => l.AssignedToUser)
+            .Include(l => l.Images)
+            .FirstOrDefaultAsync(l => l.Id == id);
+    }
+
+    public async Task<Lead?> GetByIdWithDetailsAndImagesAsync(int id)
+    {
+        return await _db.Leads
+            .Include(l => l.Property)
+            .Include(l => l.AssignedToUser)
+            .Include(l => l.Images)
             .FirstOrDefaultAsync(l => l.Id == id);
     }
 
@@ -26,6 +36,7 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
         var query = _db.Leads
             .Include(l => l.Property)
             .Include(l => l.AssignedToUser)
+            .Include(l => l.Images)
             .AsQueryable();
 
         if (intent.HasValue)

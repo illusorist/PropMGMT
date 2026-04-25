@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
     public DbSet<Lead> Leads => Set<Lead>();
+    public DbSet<LeadImage> LeadImages => Set<LeadImage>();
     public DbSet<BuyerClient> BuyerClients => Set<BuyerClient>();
     public DbSet<PropertySale> PropertySales => Set<PropertySale>();
     public DbSet<Amenity> Amenities => Set<Amenity>();
@@ -74,6 +75,19 @@ public class AppDbContext : DbContext
             .HasIndex(i => i.IsPrimary)
             .HasFilter("\"IsPrimary\" = true");
 
+        modelBuilder.Entity<LeadImage>()
+            .Property(i => i.StoredFileName).IsRequired();
+        modelBuilder.Entity<LeadImage>()
+            .Property(i => i.OriginalFileName).IsRequired();
+        modelBuilder.Entity<LeadImage>()
+            .Property(i => i.RelativePath).IsRequired();
+        modelBuilder.Entity<LeadImage>()
+            .Property(i => i.MimeType).IsRequired();
+        modelBuilder.Entity<LeadImage>()
+            .HasIndex(i => i.LeadId);
+        modelBuilder.Entity<LeadImage>()
+            .HasIndex(i => new { i.LeadId, i.SortOrder });
+
         modelBuilder.Entity<PropertyAmenity>()
             .HasKey(pa => new { pa.PropertyId, pa.AmenityId });
         modelBuilder.Entity<PropertyAmenity>()
@@ -118,6 +132,12 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(l => l.AssignedToUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<LeadImage>()
+            .HasOne(i => i.Lead)
+            .WithMany(l => l.Images)
+            .HasForeignKey(i => i.LeadId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>().HasData(new User
         {

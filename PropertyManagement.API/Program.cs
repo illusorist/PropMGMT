@@ -17,11 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<PropertyImageUploadOptions>(builder.Configuration.GetSection("PropertyImageUpload"));
+builder.Services.Configure<LeadImageUploadOptions>(builder.Configuration.GetSection("LeadImageUpload"));
 
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
 builder.Services.AddScoped<IPropertyImageStorage, DiskPropertyImageStorage>();
+builder.Services.AddScoped<ILeadImageRepository, LeadImageRepository>();
+builder.Services.AddScoped<ILeadImageStorage, DiskLeadImageStorage>();
 builder.Services.AddScoped<ILeadRepository, LeadRepository>();
 builder.Services.AddScoped<IBuyerClientRepository, BuyerClientRepository>();
 builder.Services.AddScoped<IPropertySaleRepository, PropertySaleRepository>();

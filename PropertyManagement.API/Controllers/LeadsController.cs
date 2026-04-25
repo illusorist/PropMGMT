@@ -1,5 +1,8 @@
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PropertyManagement.API.Auth;
 using PropertyManagement.Application.DTOs.Lead;
@@ -21,9 +24,21 @@ public class LeadsController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("submit")]
-    public async Task<IActionResult> Submit(LeadCreateDto dto)
+    [RequestFormLimits(MultipartBodyLengthLimit = 20_000_000)]
+    public async Task<IActionResult> Submit([FromForm] LeadCreateDto dto, [FromForm] List<IFormFile>? images, CancellationToken cancellationToken)
     {
         var leadId = await _service.CreatePublicAsync(dto);
+
+        if (images != null)
+        {
+            foreach (var file in images)
+            {
+                if (file == null || file.Length == 0) continue;
+                await using var stream = file.OpenReadStream();
+                await _service.AddImageAsync(leadId, stream, file.FileName, file.ContentType, file.Length, cancellationToken);
+            }
+        }
+
         return CreatedAtAction(nameof(GetById), new { id = leadId }, new { id = leadId });
     }
 
@@ -42,6 +57,24 @@ public class LeadsController : ControllerBase
         if (!User.IsAdminOrAgencyOwner()) return Forbid();
         var lead = await _service.GetByIdAsync(id);
         return lead == null ? NotFound() : Ok(lead);
+    }
+
+    [Authorize]
+    [HttpGet("{id}/images/{imageId:int}/file")]
+    public async Task<IActionResult> GetImageFile(int id, int imageId)
+    {
+        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        var image = await _service.GetImageFileAsync(id, imageId);
+        return File(image.Stream, image.ContentType, image.FileName);
+    }
+
+    [Authorize]
+    [HttpPost("{id}/approve")]
+    public async Task<IActionResult> Approve(int id)
+    {
+        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        var propertyId = await _service.ApproveAsync(id);
+        return Ok(new { propertyId });
     }
 
     [Authorize]

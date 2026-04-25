@@ -10,6 +10,7 @@ public interface ILeadRepository
     Task<Lead?> GetByIdAsync(int id);
     Task<Lead?> GetByIdWithDetailsAsync(int id);
     Task<List<Lead>> GetAllWithDetailsAsync(LeadIntent? intent, LeadStatus? status);
+    Task<Lead?> GetByIdWithDetailsAndImagesAsync(int id);
     Task AddAsync(Lead lead);
     Task UpdateAsync(Lead lead);
     Task DeleteAsync(int id);

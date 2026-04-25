@@ -7,6 +7,7 @@ namespace PropertyManagement.Application.Interfaces;
 public interface IOwnerRepository
 {
     Task<Owner?> GetByIdAsync(int id);
+    Task<Owner?> GetByNationalIdAsync(string nationalId);
     Task<Owner?> GetByUserIdAsync(int userId);
     Task<List<Owner>> GetAllAsync();
     Task AddAsync(Owner owner);

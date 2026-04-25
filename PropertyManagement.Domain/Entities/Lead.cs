@@ -6,6 +6,10 @@ namespace PropertyManagement.Domain.Entities;
 public class Lead : BaseEntity
 {
     public int? PropertyId { get; set; }
+    public string PropertyName { get; set; } = string.Empty;
+    public string PropertyAddress { get; set; } = string.Empty;
+    public string PropertyType { get; set; } = string.Empty;
+    public string OwnerNationalId { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
@@ -18,4 +22,5 @@ public class Lead : BaseEntity
 
     public Property? Property { get; set; }
     public User? AssignedToUser { get; set; }
+    public ICollection<LeadImage> Images { get; set; } = new List<LeadImage>();
 }
