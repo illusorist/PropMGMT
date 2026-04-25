@@ -64,6 +64,12 @@ public class LeadService
         return lead.Id;
     }
 
+    public async Task<LeadResponseDto?> GetPublicByIdAsync(int id)
+    {
+        var lead = await _leadRepo.GetByIdWithDetailsAndImagesAsync(id);
+        return lead == null ? null : MapLead(lead);
+    }
+
     public async Task<LeadImageResponseDto> AddImageAsync(
         int leadId,
         Stream stream,

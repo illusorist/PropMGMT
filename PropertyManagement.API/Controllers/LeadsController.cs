@@ -39,7 +39,8 @@ public class LeadsController : ControllerBase
             }
         }
 
-        return CreatedAtAction(nameof(GetById), new { id = leadId }, new { id = leadId });
+        var lead = await _service.GetPublicByIdAsync(leadId);
+        return CreatedAtAction(nameof(GetById), new { id = leadId }, lead);
     }
 
     [Authorize]
