@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Owner> Owners => Set<Owner>();
     public DbSet<Property> Properties => Set<Property>();
+    public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
+    public DbSet<Lead> Leads => Set<Lead>();
     public DbSet<BuyerClient> BuyerClients => Set<BuyerClient>();
     public DbSet<PropertySale> PropertySales => Set<PropertySale>();
     public DbSet<Amenity> Amenities => Set<Amenity>();
@@ -39,6 +41,13 @@ public class AppDbContext : DbContext
             .Property(p => p.Status)
             .HasConversion<string>()
             .HasDefaultValue(PropertyStatus.Pending);
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Intent)
+            .HasConversion<string>();
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Status)
+            .HasConversion<string>()
+            .HasDefaultValue(LeadStatus.New);
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status).HasConversion<string>();
 
@@ -48,6 +57,22 @@ public class AppDbContext : DbContext
             .Property(a => a.NormalizedName).IsRequired();
         modelBuilder.Entity<Amenity>()
             .HasIndex(a => a.NormalizedName).IsUnique();
+
+        modelBuilder.Entity<PropertyImage>()
+            .Property(i => i.StoredFileName).IsRequired();
+        modelBuilder.Entity<PropertyImage>()
+            .Property(i => i.OriginalFileName).IsRequired();
+        modelBuilder.Entity<PropertyImage>()
+            .Property(i => i.RelativePath).IsRequired();
+        modelBuilder.Entity<PropertyImage>()
+            .Property(i => i.MimeType).IsRequired();
+        modelBuilder.Entity<PropertyImage>()
+            .HasIndex(i => i.PropertyId);
+        modelBuilder.Entity<PropertyImage>()
+            .HasIndex(i => new { i.PropertyId, i.SortOrder });
+        modelBuilder.Entity<PropertyImage>()
+            .HasIndex(i => i.IsPrimary)
+            .HasFilter("\"IsPrimary\" = true");
 
         modelBuilder.Entity<PropertyAmenity>()
             .HasKey(pa => new { pa.PropertyId, pa.AmenityId });
@@ -76,6 +101,23 @@ public class AppDbContext : DbContext
             .HasOne(s => s.BuyerClient)
             .WithMany(b => b.Sales)
             .HasForeignKey(s => s.BuyerClientId);
+
+        modelBuilder.Entity<PropertyImage>()
+            .HasOne(i => i.Property)
+            .WithMany(p => p.Images)
+            .HasForeignKey(i => i.PropertyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Lead>()
+            .HasOne(l => l.Property)
+            .WithMany(p => p.Leads)
+            .HasForeignKey(l => l.PropertyId)
+            .OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<Lead>()
+            .HasOne(l => l.AssignedToUser)
+            .WithMany()
+            .HasForeignKey(l => l.AssignedToUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<User>().HasData(new User
         {

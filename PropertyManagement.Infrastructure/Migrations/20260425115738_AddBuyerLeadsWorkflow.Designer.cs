@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PropertyManagement.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PropertyManagement.Infrastructure.Data;
 namespace PropertyManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425115738_AddBuyerLeadsWorkflow")]
+    partial class AddBuyerLeadsWorkflow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,6 +94,63 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.ToTable("BuyerClients");
                 });
 
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.BuyerLead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssignedToUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastContactedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PreferredContactAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("PropertyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("New");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedToUserId");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("BuyerLeads");
+                });
+
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Contract", b =>
                 {
                     b.Property<int>("Id")
@@ -135,67 +195,6 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("Contracts");
-                });
-
-            modelBuilder.Entity("PropertyManagement.Domain.Entities.Lead", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AssignedToUserId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Intent")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("LastContactedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("PreferredContactAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int?>("PropertyId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("New");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssignedToUserId");
-
-                    b.HasIndex("PropertyId");
-
-                    b.ToTable("Leads");
                 });
 
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Owner", b =>
@@ -333,60 +332,6 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.ToTable("PropertyAmenities");
                 });
 
-            modelBuilder.Entity("PropertyManagement.Domain.Entities.PropertyImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("MimeType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("OriginalFileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("PropertyId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("RelativePath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("SizeBytes")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StoredFileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IsPrimary")
-                        .HasFilter("\"IsPrimary\" = true");
-
-                    b.HasIndex("PropertyId");
-
-                    b.HasIndex("PropertyId", "SortOrder");
-
-                    b.ToTable("PropertyImages");
-                });
-
             modelBuilder.Entity("PropertyManagement.Domain.Entities.PropertySale", b =>
                 {
                     b.Property<int>("Id")
@@ -502,6 +447,23 @@ namespace PropertyManagement.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.BuyerLead", b =>
+                {
+                    b.HasOne("PropertyManagement.Domain.Entities.User", "AssignedToUser")
+                        .WithMany()
+                        .HasForeignKey("AssignedToUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PropertyManagement.Domain.Entities.Property", "Property")
+                        .WithMany("BuyerLeads")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("AssignedToUser");
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Contract", b =>
                 {
                     b.HasOne("PropertyManagement.Domain.Entities.Property", "Property")
@@ -519,23 +481,6 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.Navigation("Property");
 
                     b.Navigation("Tenant");
-                });
-
-            modelBuilder.Entity("PropertyManagement.Domain.Entities.Lead", b =>
-                {
-                    b.HasOne("PropertyManagement.Domain.Entities.User", "AssignedToUser")
-                        .WithMany()
-                        .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("PropertyManagement.Domain.Entities.Property", "Property")
-                        .WithMany("Leads")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("AssignedToUser");
-
-                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Owner", b =>
@@ -588,17 +533,6 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.Navigation("Property");
                 });
 
-            modelBuilder.Entity("PropertyManagement.Domain.Entities.PropertyImage", b =>
-                {
-                    b.HasOne("PropertyManagement.Domain.Entities.Property", "Property")
-                        .WithMany("Images")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Property");
-                });
-
             modelBuilder.Entity("PropertyManagement.Domain.Entities.PropertySale", b =>
                 {
                     b.HasOne("PropertyManagement.Domain.Entities.BuyerClient", "BuyerClient")
@@ -640,9 +574,7 @@ namespace PropertyManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Property", b =>
                 {
-                    b.Navigation("Images");
-
-                    b.Navigation("Leads");
+                    b.Navigation("BuyerLeads");
 
                     b.Navigation("PropertyAmenities");
 

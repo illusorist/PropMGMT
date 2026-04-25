@@ -14,4 +14,6 @@ public class Property : BaseEntity
     public Owner Owner { get; set; } = null!;
     public ICollection<PropertyAmenity> PropertyAmenities { get; set; } = new List<PropertyAmenity>();
     public ICollection<PropertySale> Sales { get; set; } = new List<PropertySale>();
+    public ICollection<Lead> Leads { get; set; } = new List<Lead>();
+    public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
 }
