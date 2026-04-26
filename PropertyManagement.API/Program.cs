@@ -69,6 +69,18 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:8080")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -93,7 +105,11 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = imageOptions.PublicBasePath
 });
 
+// CORS
+app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+

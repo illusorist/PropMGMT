@@ -54,7 +54,7 @@ public class LeadService
             FullName = dto.FullName,
             Phone = dto.Phone,
             Email = dto.Email,
-            Notes = dto.Notes,
+            Notes = dto.Notes ?? string.Empty,
             Intent = dto.Intent,
             PreferredContactAt = dto.PreferredContactAt,
             Status = LeadStatus.New
@@ -274,7 +274,7 @@ public class LeadService
 
         lead.Status = dto.Status;
         lead.AssignedToUserId = dto.AssignedToUserId;
-        lead.Notes = dto.Notes;
+        lead.Notes = dto.Notes ?? string.Empty;
         lead.LastContactedAt = dto.LastContactedAt;
         lead.PreferredContactAt = dto.PreferredContactAt;
         lead.UpdatedAt = DateTime.UtcNow;
