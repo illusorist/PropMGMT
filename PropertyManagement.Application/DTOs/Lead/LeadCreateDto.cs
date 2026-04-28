@@ -16,5 +16,6 @@ public class LeadCreateDto
     [Required] public string Email { get; set; } = string.Empty;
     public string? Notes { get; set; }
     [Required] public LeadIntent Intent { get; set; }
+    [Required] public decimal ListedPrice { get; set; }
     public DateTime? PreferredContactAt { get; set; }
 }

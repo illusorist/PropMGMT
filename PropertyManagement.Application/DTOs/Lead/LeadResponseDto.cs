@@ -17,6 +17,7 @@ public class LeadResponseDto
     public string Email { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public LeadIntent Intent { get; set; }
+    public decimal ListedPrice { get; set; }
     public LeadStatus Status { get; set; }
     public DateTime? PreferredContactAt { get; set; }
     public DateTime? LastContactedAt { get; set; }

@@ -16,6 +16,7 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
     public async Task<Property?> GetByIdWithAmenitiesAsync(int id)
     {
         return await _db.Properties
+            .Include(p => p.Images)
             .Include(p => p.PropertyAmenities)
             .ThenInclude(pa => pa.Amenity)
             .FirstOrDefaultAsync(p => p.Id == id);
@@ -24,6 +25,7 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
     public async Task<Property?> GetByIdWithAmenitiesByOwnerIdAsync(int ownerId, int id)
     {
         return await _db.Properties
+            .Include(p => p.Images)
             .Include(p => p.PropertyAmenities)
             .ThenInclude(pa => pa.Amenity)
             .FirstOrDefaultAsync(p => p.OwnerId == ownerId && p.Id == id);
@@ -32,6 +34,7 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
     public async Task<List<Property>> GetAllWithAmenitiesAsync()
     {
         return await _db.Properties
+            .Include(p => p.Images)
             .Include(p => p.PropertyAmenities)
             .ThenInclude(pa => pa.Amenity)
             .ToListAsync();
@@ -40,6 +43,7 @@ public class PropertyRepository : BaseRepository<Property>, IPropertyRepository
     public async Task<List<Property>> GetAllWithAmenitiesByOwnerIdAsync(int ownerId)
     {
         return await _db.Properties
+            .Include(p => p.Images)
             .Include(p => p.PropertyAmenities)
             .ThenInclude(pa => pa.Amenity)
             .Where(p => p.OwnerId == ownerId)

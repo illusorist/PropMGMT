@@ -44,6 +44,8 @@ public class LeadService
 
     public async Task<int> CreatePublicAsync(LeadCreateDto dto)
     {
+        ValidateLeadInput(dto.PropertyName, dto.PropertyAddress, dto.PropertyType, dto.OwnerNationalId, dto.FullName, dto.Phone, dto.Email, dto.ListedPrice);
+
         var lead = new Lead
         {
             PropertyId = dto.PropertyId,
@@ -56,6 +58,7 @@ public class LeadService
             Email = dto.Email,
             Notes = dto.Notes ?? string.Empty,
             Intent = dto.Intent,
+            ListedPrice = dto.ListedPrice,
             PreferredContactAt = dto.PreferredContactAt,
             Status = LeadStatus.New
         };
@@ -175,6 +178,8 @@ public class LeadService
                 Name = lead.PropertyName,
                 Address = lead.PropertyAddress,
                 Type = lead.PropertyType,
+                SalePrice = lead.Intent == LeadIntent.Buy || lead.Intent == LeadIntent.Sell ? lead.ListedPrice : null,
+                RentPrice = lead.Intent == LeadIntent.Rent || lead.Intent == LeadIntent.LetOut ? lead.ListedPrice : null,
                 Status = PropertyStatus.Approved
             };
             await _propertyRepo.AddAsync(property);
@@ -265,6 +270,9 @@ public class LeadService
         var lead = await _leadRepo.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Lead {id} not found");
 
+        if (dto.ListedPrice <= 0)
+            throw new ArgumentException("Listed price must be greater than zero.");
+
         if (dto.AssignedToUserId.HasValue)
         {
             var user = await _userRepo.GetByIdAsync(dto.AssignedToUserId.Value);
@@ -275,6 +283,7 @@ public class LeadService
         lead.Status = dto.Status;
         lead.AssignedToUserId = dto.AssignedToUserId;
         lead.Notes = dto.Notes ?? string.Empty;
+        lead.ListedPrice = dto.ListedPrice;
         lead.LastContactedAt = dto.LastContactedAt;
         lead.PreferredContactAt = dto.PreferredContactAt;
         lead.UpdatedAt = DateTime.UtcNow;
@@ -297,6 +306,7 @@ public class LeadService
             Email = lead.Email,
             Notes = lead.Notes,
             Intent = lead.Intent,
+            ListedPrice = lead.ListedPrice,
             Status = lead.Status,
             PreferredContactAt = lead.PreferredContactAt,
             LastContactedAt = lead.LastContactedAt,
@@ -321,5 +331,17 @@ public class LeadService
             FileUrl = $"/api/leads/{image.LeadId}/images/{image.Id}/file",
             CreatedAt = image.CreatedAt
         };
+    }
+
+    private static void ValidateLeadInput(string propertyName, string propertyAddress, string propertyType, string ownerNationalId, string fullName, string phone, string email, decimal listedPrice)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Property name is required.");
+        if (string.IsNullOrWhiteSpace(propertyAddress)) throw new ArgumentException("Property address is required.");
+        if (string.IsNullOrWhiteSpace(propertyType)) throw new ArgumentException("Property type is required.");
+        if (string.IsNullOrWhiteSpace(ownerNationalId)) throw new ArgumentException("Owner national ID is required.");
+        if (string.IsNullOrWhiteSpace(fullName)) throw new ArgumentException("Contact name is required.");
+        if (string.IsNullOrWhiteSpace(phone)) throw new ArgumentException("Phone is required.");
+        if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.");
+        if (listedPrice <= 0) throw new ArgumentException("Listed price must be greater than zero.");
     }
 }

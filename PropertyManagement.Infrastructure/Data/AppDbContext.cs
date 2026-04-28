@@ -33,6 +33,12 @@ public class AppDbContext : DbContext
             .Property(s => s.SalePrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Payment>()
             .Property(p => p.Amount).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.ListedPrice).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.SalePrice).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.RentPrice).HasColumnType("numeric(18,2)");
 
         modelBuilder.Entity<Contract>()
             .Property(c => c.Status).HasConversion<string>();

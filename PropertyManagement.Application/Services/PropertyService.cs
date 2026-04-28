@@ -14,11 +14,13 @@ public class PropertyService
 {
     private readonly IPropertyRepository _repo;
     private readonly IAmenityRepository _amenityRepo;
+    private readonly IPropertyImageStorage _propertyImageStorage;
 
-    public PropertyService(IPropertyRepository repo, IAmenityRepository amenityRepo)
+    public PropertyService(IPropertyRepository repo, IAmenityRepository amenityRepo, IPropertyImageStorage propertyImageStorage)
     {
         _repo = repo;
         _amenityRepo = amenityRepo;
+        _propertyImageStorage = propertyImageStorage;
     }
 
     public async Task<List<PropertyResponseDto>> GetAllAsync()
@@ -31,6 +33,9 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            SalePrice = p.SalePrice,
+            RentPrice = p.RentPrice,
+            PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
@@ -48,6 +53,9 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            SalePrice = p.SalePrice,
+            RentPrice = p.RentPrice,
+            PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
@@ -64,6 +72,9 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            SalePrice = p.SalePrice,
+            RentPrice = p.RentPrice,
+            PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
@@ -81,10 +92,46 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            SalePrice = p.SalePrice,
+            RentPrice = p.RentPrice,
+            PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
         };
+    }
+
+    public async Task<List<PublicPropertyResponseDto>> GetPublicAvailableAsync()
+    {
+        var properties = await _repo.GetAllWithAmenitiesAsync();
+        return properties
+            .Where(p => p.Status == PropertyStatus.Approved)
+            .Select(p => new PublicPropertyResponseDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Address = p.Address,
+                Type = p.Type,
+                SalePrice = p.SalePrice,
+                RentPrice = p.RentPrice,
+                PrimaryImageUrl = GetPrimaryImageUrl(p),
+                Images = p.Images
+                    .OrderBy(i => i.SortOrder)
+                    .ThenBy(i => i.Id)
+                    .Select(i => new PublicPropertyImageDto
+                    {
+                        Id = i.Id,
+                        OriginalFileName = i.OriginalFileName,
+                        Url = _propertyImageStorage.BuildPublicUrl(i.RelativePath),
+                        IsPrimary = i.IsPrimary,
+                        SortOrder = i.SortOrder
+                    })
+                    .ToList(),
+                Status = p.Status,
+                CreatedAt = p.CreatedAt,
+                Amenities = MapAmenities(p)
+            })
+            .ToList();
     }
 
     public async Task<int> CreateAsync(PropertyCreateDto dto)
@@ -97,6 +144,8 @@ public class PropertyService
             Name = dto.Name,
             Address = dto.Address,
             Type = dto.Type,
+            SalePrice = dto.SalePrice,
+            RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
                 AmenityId = id
@@ -116,6 +165,8 @@ public class PropertyService
             Name = dto.Name,
             Address = dto.Address,
             Type = dto.Type,
+            SalePrice = dto.SalePrice,
+            RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
                 AmenityId = id
@@ -135,6 +186,8 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
+        property.SalePrice = dto.SalePrice;
+        property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;
         property.PropertyAmenities.Clear();
         foreach (var amenityId in amenityIds)
@@ -157,6 +210,8 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
+        property.SalePrice = dto.SalePrice;
+        property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;
         property.PropertyAmenities.Clear();
         foreach (var amenityId in amenityIds)
@@ -218,5 +273,12 @@ public class PropertyService
                 CreatedAt = pa.Amenity.CreatedAt
             })
             .ToList();
+    }
+
+    private string? GetPrimaryImageUrl(Property property)
+    {
+        var primaryImage = property.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id).FirstOrDefault(i => i.IsPrimary)
+            ?? property.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id).FirstOrDefault();
+        return primaryImage == null ? null : _propertyImageStorage.BuildPublicUrl(primaryImage.RelativePath);
     }
 }
