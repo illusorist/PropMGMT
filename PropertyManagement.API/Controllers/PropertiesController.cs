@@ -30,9 +30,15 @@ public class PropertiesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var property = User.IsOwnerClient() && User.GetOwnerId().HasValue
-            ? await _service.GetByIdForOwnerAsync(User.GetOwnerId()!.Value, id)
-            : await _service.GetByIdAsync(id);
+        if (User.IsOwnerClient())
+        {
+            var ownerId = User.GetOwnerId();
+            if (!ownerId.HasValue) return Forbid();
+            var ownerProperty = await _service.GetByIdForOwnerAsync(ownerId.Value, id);
+            return ownerProperty == null ? NotFound() : Ok(ownerProperty);
+        }
+
+        var property = await _service.GetByIdAsync(id);
         return property == null ? NotFound() : Ok(property);
     }
 
@@ -87,7 +93,7 @@ public class PropertiesController : ControllerBase
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, PropertyStatusUpdateDto dto)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _service.UpdateStatusAsync(id, dto.Status);
         return NoContent();
     }

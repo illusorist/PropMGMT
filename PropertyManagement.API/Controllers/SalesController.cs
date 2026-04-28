@@ -29,7 +29,7 @@ public class SalesController : ControllerBase
             return Ok(await _service.GetAllForOwnerAsync(ownerId.Value));
         }
 
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         return Ok(await _service.GetAllAsync());
     }
 
@@ -44,7 +44,7 @@ public class SalesController : ControllerBase
             return ownerSale == null ? NotFound() : Ok(ownerSale);
         }
 
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         var sale = await _service.GetByIdAsync(id);
         return sale == null ? NotFound() : Ok(sale);
     }
@@ -52,7 +52,7 @@ public class SalesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(SaleCreateDto dto)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _service.CreateAsync(dto);
         return NoContent();
     }

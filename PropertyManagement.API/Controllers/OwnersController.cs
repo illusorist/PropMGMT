@@ -73,7 +73,7 @@ public class OwnersController : ControllerBase
     [HttpPost("{id}/account")]
     public async Task<IActionResult> CreateAccount(int id, OwnerAccountCreateDto dto)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _accountService.CreateAccountAsync(id, dto);
         return NoContent();
     }
@@ -86,7 +86,7 @@ public class OwnersController : ControllerBase
             var ownerId = User.GetOwnerId();
             if (!ownerId.HasValue || ownerId.Value != id) return Forbid();
         }
-        if (!User.IsOwnerClient() && !User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsOwnerClient() && !User.IsAdmin()) return Forbid();
         return Ok(await _statsService.GetStatsAsync(id));
     }
 }

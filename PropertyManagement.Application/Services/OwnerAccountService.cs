@@ -25,6 +25,8 @@ public class OwnerAccountService
         if (owner.UserId.HasValue)
             throw new InvalidOperationException("Owner already has an account");
 
+        PasswordPolicy.EnsureStrong(dto.Password);
+
         var existingUser = await _userRepo.GetByUsernameAsync(dto.Username);
         if (existingUser != null)
             throw new InvalidOperationException("Username already in use");

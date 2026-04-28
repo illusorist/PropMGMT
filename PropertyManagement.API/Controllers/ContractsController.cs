@@ -30,9 +30,15 @@ public class ContractsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var contract = User.IsOwnerClient() && User.GetOwnerId().HasValue
-            ? await _service.GetByIdForOwnerAsync(User.GetOwnerId()!.Value, id)
-            : await _service.GetByIdAsync(id);
+        if (User.IsOwnerClient())
+        {
+            var ownerId = User.GetOwnerId();
+            if (!ownerId.HasValue) return Forbid();
+            var ownerContract = await _service.GetByIdForOwnerAsync(ownerId.Value, id);
+            return ownerContract == null ? NotFound() : Ok(ownerContract);
+        }
+
+        var contract = await _service.GetByIdAsync(id);
         return contract == null ? NotFound() : Ok(contract);
     }
 

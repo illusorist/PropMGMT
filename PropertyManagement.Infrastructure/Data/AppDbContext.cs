@@ -23,8 +23,6 @@ public class AppDbContext : DbContext
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Payment> Payments => Set<Payment>();
 
-    //TODO : Delete this
-    //    string hash = BCrypt.Net.BCrypt.HashPassword("admin123");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         //TODO : Configure Relationships and Constraints
@@ -139,16 +137,5 @@ public class AppDbContext : DbContext
             .HasForeignKey(i => i.LeadId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<User>().HasData(new User
-        {
-            // TODO : Change this password hash to a more secure one before production
-            // Or really consider implementing a proper user management system with registration, password reset, etc.
-            
-            Id = 1,
-            Username = "admin",
-            PasswordHash = "$2a$12$zxxAdgPh00F5tMWopmrSxebIlwof7p/rFcfDcjhMoM0UaLey9Mr5q",
-            Role = "Admin",
-            CreatedAt = DateTime.SpecifyKind(new DateTime(2026, 4, 20, 0, 0, 0), DateTimeKind.Utc)
-        });
     }
 }

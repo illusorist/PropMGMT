@@ -88,7 +88,7 @@ public class PropertyImagesController : ControllerBase
             return true;
         }
 
-        if (!User.IsAdminOrAgencyOwner())
+        if (!User.IsAdmin())
         {
             ownerId = null;
             error = Forbid();

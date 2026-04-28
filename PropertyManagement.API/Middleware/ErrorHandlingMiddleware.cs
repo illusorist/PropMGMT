@@ -18,15 +18,33 @@ public class ErrorHandlingMiddleware
         }
         catch (KeyNotFoundException ex)
         {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { error = ex.Message });
+            await WriteErrorAsync(context, StatusCodes.Status404NotFound, ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            await WriteErrorAsync(context, StatusCodes.Status400BadRequest, ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            await WriteErrorAsync(context, StatusCodes.Status400BadRequest, ex.Message);
         }
         catch (Exception ex)
         {
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new { error = "An unexpected error occurred.", detail = ex.Message });
+            await WriteErrorAsync(context, StatusCodes.Status500InternalServerError, "An unexpected error occurred.", ex.Message);
         }
+    }
+
+    private static async Task WriteErrorAsync(HttpContext context, int statusCode, string message, string? detail = null)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/json";
+
+        if (detail == null)
+        {
+            await context.Response.WriteAsJsonAsync(new { error = message });
+            return;
+        }
+
+        await context.Response.WriteAsJsonAsync(new { error = message, detail });
     }
 }

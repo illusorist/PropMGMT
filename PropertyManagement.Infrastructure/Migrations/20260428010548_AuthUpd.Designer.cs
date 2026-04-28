@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PropertyManagement.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PropertyManagement.Infrastructure.Data;
 namespace PropertyManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428010548_AuthUpd")]
+    partial class AuthUpd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -557,6 +560,16 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 4, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            PasswordHash = "$2a$12$zxxAdgPh00F5tMWopmrSxebIlwof7p/rFcfDcjhMoM0UaLey9Mr5q",
+                            Role = "Admin",
+                            Username = "admin"
+                        });
                 });
 
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Contract", b =>

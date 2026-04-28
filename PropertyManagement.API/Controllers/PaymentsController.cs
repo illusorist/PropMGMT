@@ -30,9 +30,15 @@ public class PaymentsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var payment = User.IsOwnerClient() && User.GetOwnerId().HasValue
-            ? await _service.GetByIdForOwnerAsync(User.GetOwnerId()!.Value, id)
-            : await _service.GetByIdAsync(id);
+        if (User.IsOwnerClient())
+        {
+            var ownerId = User.GetOwnerId();
+            if (!ownerId.HasValue) return Forbid();
+            var ownerPayment = await _service.GetByIdForOwnerAsync(ownerId.Value, id);
+            return ownerPayment == null ? NotFound() : Ok(ownerPayment);
+        }
+
+        var payment = await _service.GetByIdAsync(id);
         return payment == null ? NotFound() : Ok(payment);
     }
 

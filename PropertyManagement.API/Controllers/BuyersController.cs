@@ -22,14 +22,14 @@ public class BuyersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         var buyer = await _service.GetByIdAsync(id);
         return buyer == null ? NotFound() : Ok(buyer);
     }
@@ -37,7 +37,7 @@ public class BuyersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(BuyerCreateDto dto)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
     }
@@ -45,7 +45,7 @@ public class BuyersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, BuyerCreateDto dto)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }
@@ -53,7 +53,7 @@ public class BuyersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        if (!User.IsAdminOrAgencyOwner()) return Forbid();
+        if (!User.IsAdmin()) return Forbid();
         await _service.DeleteAsync(id);
         return NoContent();
     }

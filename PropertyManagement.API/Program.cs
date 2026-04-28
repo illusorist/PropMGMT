@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PropertyManagement.API.Middleware;
+using PropertyManagement.API.Startup;
 using PropertyManagement.Application.Configuration;
 using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Application.Services;
@@ -11,6 +13,7 @@ using PropertyManagement.Infrastructure.Data;
 using PropertyManagement.Infrastructure.Repositories;
 using PropertyManagement.Infrastructure.Storage;
 using Scalar.AspNetCore;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +52,7 @@ builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserAccountService>();
+builder.Services.AddScoped<BootstrapAdminInitializer>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -71,6 +75,23 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services
     .AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var details = context.ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Invalid request." : e.ErrorMessage)
+                .Distinct()
+                .ToArray();
+
+            return new BadRequestObjectResult(new
+            {
+                error = "Validation failed",
+                details
+            });
+        };
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(
@@ -96,6 +117,9 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
+
+    var bootstrapAdmin = scope.ServiceProvider.GetRequiredService<BootstrapAdminInitializer>();
+    await bootstrapAdmin.EnsureBootstrapAdminAsync();
 }
 
 app.MapOpenApi();
