@@ -45,17 +45,18 @@ public class PropertiesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(PropertyCreateDto dto)
     {
+        int propertyId;
         if (User.IsOwnerClient())
         {
             var ownerId = User.GetOwnerId();
             if (!ownerId.HasValue) return Forbid();
-            await _service.CreateForOwnerAsync(ownerId.Value, dto);
+            propertyId = await _service.CreateForOwnerAsync(ownerId.Value, dto);
         }
         else
         {
-            await _service.CreateAsync(dto);
+            propertyId = await _service.CreateAsync(dto);
         }
-        return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
+        return CreatedAtAction(nameof(GetById), new { id = propertyId }, new { id = propertyId });
     }
 
     [HttpPut("{id}")]

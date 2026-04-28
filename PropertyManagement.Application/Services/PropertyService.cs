@@ -87,7 +87,7 @@ public class PropertyService
         };
     }
 
-    public async Task CreateAsync(PropertyCreateDto dto)
+    public async Task<int> CreateAsync(PropertyCreateDto dto)
     {
         var amenityIds = NormalizeAmenityIds(dto.AmenityIds);
         await EnsureAmenitiesExistAsync(amenityIds);
@@ -103,9 +103,10 @@ public class PropertyService
             }).ToList()
         };
         await _repo.AddAsync(property);
+        return property.Id;
     }
 
-    public async Task CreateForOwnerAsync(int ownerId, PropertyCreateDto dto)
+    public async Task<int> CreateForOwnerAsync(int ownerId, PropertyCreateDto dto)
     {
         var amenityIds = NormalizeAmenityIds(dto.AmenityIds);
         await EnsureAmenitiesExistAsync(amenityIds);
@@ -121,6 +122,7 @@ public class PropertyService
             }).ToList()
         };
         await _repo.AddAsync(property);
+        return property.Id;
     }
 
     public async Task UpdateAsync(int id, PropertyCreateDto dto)
