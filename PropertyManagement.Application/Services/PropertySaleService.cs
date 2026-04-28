@@ -61,7 +61,7 @@ public class PropertySaleService
             BuyerClientId = dto.BuyerClientId,
             SalePrice = dto.SalePrice,
             DeedNumber = dto.DeedNumber,
-            SoldAt = dto.SoldAt
+            SoldAt = DateTime.SpecifyKind(dto.SoldAt, DateTimeKind.Utc)
         };
 
         await _saleRepo.AddAsync(sale);

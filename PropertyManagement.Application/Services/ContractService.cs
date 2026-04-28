@@ -19,6 +19,15 @@ public class ContractService
         _paymentRepo = paymentRepo;
     }
 
+    private static void ValidateContractInput(ContractCreateDto dto)
+    {
+        if (dto.PropertyId <= 0) throw new ArgumentException("Property is required.");
+        if (dto.TenantId <= 0) throw new ArgumentException("Tenant is required.");
+        if (string.IsNullOrWhiteSpace(dto.DeedNumber)) throw new ArgumentException("Deed number is required.");
+        if (dto.MonthlyRent <= 0) throw new ArgumentException("Monthly rent must be greater than zero.");
+        if (dto.StartDate > dto.EndDate) throw new ArgumentException("Start date must be on or before end date.");
+    }
+
     public async Task<List<ContractResponseDto>> GetAllAsync()
     {
         var contracts = await _repo.GetAllAsync();
@@ -89,23 +98,46 @@ public class ContractService
         };
     }
 
-    public async Task CreateAsync(ContractCreateDto dto)
+    public async Task<ContractResponseDto> CreateAsync(ContractCreateDto dto)
     {
+        ValidateContractInput(dto);
+
         var contract = new Contract
         {
             PropertyId = dto.PropertyId,
             TenantId = dto.TenantId,
             DeedNumber = dto.DeedNumber,
-            StartDate = dto.StartDate,
-            EndDate = dto.EndDate,
+            StartDate = DateTime.SpecifyKind(dto.StartDate, DateTimeKind.Utc),
+            EndDate = DateTime.SpecifyKind(dto.EndDate, DateTimeKind.Utc),
             MonthlyRent = dto.MonthlyRent,
             Status = dto.Status
         };
         await _repo.AddAsync(contract);
+
+        // If contract is created already Active, generate payments immediately
+        if (contract.Status == ContractStatus.Active)
+        {
+            await GeneratePaymentsAsync(contract);
+        }
+
+        return new ContractResponseDto
+        {
+            Id = contract.Id,
+            PropertyId = contract.PropertyId,
+            TenantId = contract.TenantId,
+            DeedNumber = contract.DeedNumber,
+            StartDate = contract.StartDate,
+            EndDate = contract.EndDate,
+            MonthlyRent = contract.MonthlyRent,
+            Status = contract.Status,
+            CreatedAt = contract.CreatedAt
+        };
     }
 
     public async Task UpdateAsync(int id, ContractCreateDto dto)
     {
+        ValidateContractInput(dto);
+
         var contract = await _repo.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Contract {id} not found");
         
@@ -115,8 +147,8 @@ public class ContractService
         contract.PropertyId = dto.PropertyId;
         contract.TenantId = dto.TenantId;
         contract.DeedNumber = dto.DeedNumber;
-        contract.StartDate = dto.StartDate;
-        contract.EndDate = dto.EndDate;
+        contract.StartDate = DateTime.SpecifyKind(dto.StartDate, DateTimeKind.Utc);
+        contract.EndDate = DateTime.SpecifyKind(dto.EndDate, DateTimeKind.Utc);
         contract.MonthlyRent = dto.MonthlyRent;
         contract.Status = dto.Status;
         contract.UpdatedAt = DateTime.UtcNow;
@@ -139,7 +171,7 @@ public class ContractService
         }
 
         var payments = new List<Payment>();
-        var currentDate = new DateTime(contract.StartDate.Year, contract.StartDate.Month, 1);
+        var currentDate = new DateTime(contract.StartDate.Year, contract.StartDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
         // Generate a payment for the first day of each month from start date to end date
         while (currentDate <= contract.EndDate)
@@ -159,8 +191,8 @@ public class ContractService
                 });
             }
 
-            // Move to the first day of next month
-            currentDate = currentDate.AddMonths(1);
+            // Move to the first day of next month (preserve UTC kind)
+            currentDate = DateTime.SpecifyKind(currentDate.AddMonths(1), DateTimeKind.Utc);
         }
 
         // Add all generated payments to the repository

@@ -46,8 +46,8 @@ public class ContractsController : ControllerBase
     public async Task<IActionResult> Create(ContractCreateDto dto)
     {
         if (User.IsOwnerClient()) return Forbid();
-        await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]

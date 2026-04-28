@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace PropertyManagement.API.Middleware;
 
@@ -27,6 +28,10 @@ public class ErrorHandlingMiddleware
         catch (InvalidOperationException ex)
         {
             await WriteErrorAsync(context, StatusCodes.Status400BadRequest, ex.Message);
+        }
+        catch (DbUpdateException ex)
+        {
+            await WriteErrorAsync(context, StatusCodes.Status400BadRequest, "Invalid data for this operation.", ex.InnerException?.Message ?? ex.Message);
         }
         catch (Exception ex)
         {

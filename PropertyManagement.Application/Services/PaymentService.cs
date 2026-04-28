@@ -80,8 +80,8 @@ public class PaymentService
         var payment = new Payment
         {
             ContractId = dto.ContractId,
-            DueDate = dto.DueDate,
-            PaidDate = dto.PaidDate,
+            DueDate = DateTime.SpecifyKind(dto.DueDate, DateTimeKind.Utc),
+            PaidDate = dto.PaidDate.HasValue ? DateTime.SpecifyKind(dto.PaidDate.Value, DateTimeKind.Utc) : null,
             Amount = dto.Amount,
             Status = dto.Status
         };
@@ -92,9 +92,9 @@ public class PaymentService
     {
         var payment = await _repo.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Payment {id} not found");
-        payment.ContractId = dto.ContractId;
-        payment.DueDate = dto.DueDate;
-        payment.PaidDate = dto.PaidDate;
+        // Preserve original contract linkage; payment should remain tied to source contract.
+        payment.DueDate = DateTime.SpecifyKind(dto.DueDate, DateTimeKind.Utc);
+        payment.PaidDate = dto.PaidDate.HasValue ? DateTime.SpecifyKind(dto.PaidDate.Value, DateTimeKind.Utc) : null;
         payment.Amount = dto.Amount;
         payment.Status = dto.Status;
         payment.UpdatedAt = DateTime.UtcNow;
