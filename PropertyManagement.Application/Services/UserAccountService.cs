@@ -11,10 +11,14 @@ namespace PropertyManagement.Application.Services;
 public class UserAccountService
 {
     private readonly IUserRepository _userRepo;
+    private readonly IOwnerRepository _ownerRepo;
+    private readonly ILeadRepository _leadRepo;
 
-    public UserAccountService(IUserRepository userRepo)
+    public UserAccountService(IUserRepository userRepo, IOwnerRepository ownerRepo, ILeadRepository leadRepo)
     {
         _userRepo = userRepo;
+        _ownerRepo = ownerRepo;
+        _leadRepo = leadRepo;
     }
 
     public async Task<UserResponseDto> CreateStaffAccountAsync(UserCreateDto dto)
@@ -121,6 +125,17 @@ public class UserAccountService
 
     public async Task DeleteAsync(int id)
     {
+        var user = await _userRepo.GetByIdAsync(id)
+            ?? throw new KeyNotFoundException($"User {id} not found");
+
+        var linkedOwner = await _ownerRepo.GetByUserIdAsync(id);
+        if (linkedOwner != null)
+            throw new InvalidOperationException($"Cannot delete user '{user.Username}' because it is linked to owner account '{linkedOwner.FullName}'. Delete the owner's account first or unlink the user.");
+
+        var assignedLeads = await _leadRepo.GetAllWithDetailsAsync(null, null);
+        if (assignedLeads.Any(l => l.AssignedToUserId == id))
+            throw new InvalidOperationException($"Cannot delete user '{user.Username}' because it is assigned to one or more leads. Unassign the user from all leads first.");
+
         await _userRepo.DeleteAsync(id);
     }
 
