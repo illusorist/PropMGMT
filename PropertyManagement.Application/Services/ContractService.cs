@@ -5,13 +5,19 @@ using System.Threading.Tasks;
 using PropertyManagement.Application.DTOs.Contract;
 using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Domain.Entities;
+using PropertyManagement.Domain.Enums;
 
 namespace PropertyManagement.Application.Services;
 
 public class ContractService
 {
     private readonly IContractRepository _repo;
-    public ContractService(IContractRepository repo) => _repo = repo;
+    private readonly IPaymentRepository _paymentRepo;
+    public ContractService(IContractRepository repo, IPaymentRepository paymentRepo)
+    {
+        _repo = repo;
+        _paymentRepo = paymentRepo;
+    }
 
     public async Task<List<ContractResponseDto>> GetAllAsync()
     {
@@ -102,6 +108,10 @@ public class ContractService
     {
         var contract = await _repo.GetByIdAsync(id)
             ?? throw new KeyNotFoundException($"Contract {id} not found");
+        
+        var wasActive = contract.Status == ContractStatus.Active;
+        var isBecomingActive = dto.Status == ContractStatus.Active && !wasActive;
+
         contract.PropertyId = dto.PropertyId;
         contract.TenantId = dto.TenantId;
         contract.DeedNumber = dto.DeedNumber;
@@ -111,6 +121,53 @@ public class ContractService
         contract.Status = dto.Status;
         contract.UpdatedAt = DateTime.UtcNow;
         await _repo.UpdateAsync(contract);
+
+        // Generate payments if contract is becoming Active and no payments exist yet
+        if (isBecomingActive)
+        {
+            await GeneratePaymentsAsync(contract);
+        }
+    }
+
+    private async Task GeneratePaymentsAsync(Contract contract)
+    {
+        // Check if payments already exist for this contract
+        var existingPayments = await _paymentRepo.GetAllByContractIdAsync(contract.Id);
+        if (existingPayments.Any())
+        {
+            return; // Payments already generated
+        }
+
+        var payments = new List<Payment>();
+        var currentDate = new DateTime(contract.StartDate.Year, contract.StartDate.Month, 1);
+
+        // Generate a payment for the first day of each month from start date to end date
+        while (currentDate <= contract.EndDate)
+        {
+            var dueDate = currentDate;
+            
+            // Only add payment if the due date is within the contract period
+            if (dueDate >= contract.StartDate && dueDate <= contract.EndDate)
+            {
+                payments.Add(new Payment
+                {
+                    ContractId = contract.Id,
+                    DueDate = dueDate,
+                    Amount = contract.MonthlyRent,
+                    Status = PaymentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+
+            // Move to the first day of next month
+            currentDate = currentDate.AddMonths(1);
+        }
+
+        // Add all generated payments to the repository
+        foreach (var payment in payments)
+        {
+            await _paymentRepo.AddAsync(payment);
+        }
     }
 
     public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);

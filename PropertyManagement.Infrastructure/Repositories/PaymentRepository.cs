@@ -25,4 +25,12 @@ public class PaymentRepository : BaseRepository<Payment>, IPaymentRepository
             .Where(p => p.Contract.Property.OwnerId == ownerId)
             .ToListAsync();
     }
+
+    public async Task<List<Payment>> GetAllByContractIdAsync(int contractId)
+    {
+        return await _db.Payments
+            .Where(p => p.ContractId == contractId)
+            .OrderBy(p => p.DueDate)
+            .ToListAsync();
+    }
 }
