@@ -59,7 +59,7 @@ public class LeadService
             Notes = dto.Notes ?? string.Empty,
             Intent = dto.Intent,
             ListedPrice = dto.ListedPrice,
-            PreferredContactAt = dto.PreferredContactAt,
+            PreferredContactAt = NormalizeUtc(dto.PreferredContactAt),
             Status = LeadStatus.New
         };
 
@@ -284,8 +284,8 @@ public class LeadService
         lead.AssignedToUserId = dto.AssignedToUserId;
         lead.Notes = dto.Notes ?? string.Empty;
         lead.ListedPrice = dto.ListedPrice;
-        lead.LastContactedAt = dto.LastContactedAt;
-        lead.PreferredContactAt = dto.PreferredContactAt;
+        lead.LastContactedAt = NormalizeUtc(dto.LastContactedAt);
+        lead.PreferredContactAt = NormalizeUtc(dto.PreferredContactAt);
         lead.UpdatedAt = DateTime.UtcNow;
 
         await _leadRepo.UpdateAsync(lead);
@@ -343,5 +343,10 @@ public class LeadService
         if (string.IsNullOrWhiteSpace(phone)) throw new ArgumentException("Phone is required.");
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.");
         if (listedPrice <= 0) throw new ArgumentException("Listed price must be greater than zero.");
+    }
+
+    private static DateTime? NormalizeUtc(DateTime? value)
+    {
+        return value.HasValue ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc) : null;
     }
 }
