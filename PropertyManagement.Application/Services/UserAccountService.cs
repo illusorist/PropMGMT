@@ -42,38 +42,25 @@ public class UserAccountService
 
         await _userRepo.AddAsync(user);
 
-        return new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt
-        };
+        return await MapUserAsync(user);
     }
 
     public async Task<List<UserResponseDto>> GetAllAsync()
     {
         var users = await _userRepo.GetAllAsync();
-        return users.Select(u => new UserResponseDto
-        {
-            Id = u.Id,
-            Username = u.Username,
-            Role = u.Role,
-            CreatedAt = u.CreatedAt
-        }).ToList();
+        var owners = await _ownerRepo.GetAllAsync();
+        var ownerByUserId = owners
+            .Where(owner => owner.UserId.HasValue)
+            .ToDictionary(owner => owner.UserId!.Value);
+
+        return users.Select(user => MapUser(user, ownerByUserId.TryGetValue(user.Id, out var owner) ? owner : null)).ToList();
     }
 
     public async Task<UserResponseDto?> GetByIdAsync(int id)
     {
         var u = await _userRepo.GetByIdAsync(id);
         if (u == null) return null;
-        return new UserResponseDto
-        {
-            Id = u.Id,
-            Username = u.Username,
-            Role = u.Role,
-            CreatedAt = u.CreatedAt
-        };
+        return await MapUserAsync(u);
     }
 
     public async Task<UserResponseDto> UpdateAsync(int id, UserUpdateDto dto)
@@ -114,13 +101,7 @@ public class UserAccountService
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepo.UpdateAsync(user);
 
-        return new UserResponseDto
-        {
-            Id = user.Id,
-            Username = user.Username,
-            Role = user.Role,
-            CreatedAt = user.CreatedAt
-        };
+        return await MapUserAsync(user);
     }
 
     public async Task DeleteAsync(int id)
@@ -158,6 +139,25 @@ public class UserAccountService
             "admin" => "Admin",
             "ownerclient" => "OwnerClient",
             _ => role.Trim()
+        };
+    }
+
+    private async Task<UserResponseDto> MapUserAsync(User user)
+    {
+        var owner = await _ownerRepo.GetByUserIdAsync(user.Id);
+        return MapUser(user, owner);
+    }
+
+    private static UserResponseDto MapUser(User user, Owner? owner)
+    {
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Role = user.Role,
+            OwnerId = owner?.Id,
+            OwnerFullName = owner?.FullName,
+            CreatedAt = user.CreatedAt
         };
     }
 
