@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -33,7 +34,7 @@ public class AuthService
 
         var owner = await _ownerRepo.GetByUserIdAsync(user.Id);
         var token = GenerateToken(user, owner?.Id);
-        return new AuthResponseDto { Token = token, Username = user.Username, Role = user.Role };
+        return new AuthResponseDto { Token = token, Username = user.Username, Role = user.Role, ScreenPermissions = ReadScreenPermissions(user) };
     }
 
     private string GenerateToken(User user, int? ownerId)
@@ -44,7 +45,8 @@ public class AuthService
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role)
+            new Claim(ClaimTypes.Role, user.Role),
+            new Claim("screen_permissions", JsonSerializer.Serialize(ReadScreenPermissions(user)))
         };
         if (ownerId.HasValue)
         {
@@ -58,5 +60,19 @@ public class AuthService
             signingCredentials: creds
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static List<string> ReadScreenPermissions(User user)
+    {
+        if (string.IsNullOrWhiteSpace(user.ScreenPermissionsJson)) return [];
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(user.ScreenPermissionsJson) ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 }

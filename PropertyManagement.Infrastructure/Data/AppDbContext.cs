@@ -56,6 +56,12 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Payment>()
             .Property(p => p.Status).HasConversion<string>();
 
+        modelBuilder.Entity<User>()
+            .Property(u => u.ScreenPermissionsJson)
+            .IsRequired()
+            .HasColumnType("text")
+            .HasDefaultValue("[]");
+
         modelBuilder.Entity<Amenity>()
             .Property(a => a.Name).IsRequired();
         modelBuilder.Entity<Amenity>()

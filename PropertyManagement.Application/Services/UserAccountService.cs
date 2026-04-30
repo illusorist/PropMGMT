@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using PropertyManagement.Application.DTOs.User;
 using PropertyManagement.Application.Interfaces;
@@ -10,6 +11,20 @@ namespace PropertyManagement.Application.Services;
 
 public class UserAccountService
 {
+    private static readonly HashSet<string> EmployeeVisibleScreens = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "/app",
+        "/app/owners",
+        "/app/properties",
+        "/app/amenities",
+        "/app/tenants",
+        "/app/contracts",
+        "/app/payments",
+        "/app/buyers",
+        "/app/sales",
+        "/app/leads"
+    };
+
     private readonly IUserRepository _userRepo;
     private readonly IOwnerRepository _ownerRepo;
     private readonly ILeadRepository _leadRepo;
@@ -25,7 +40,9 @@ public class UserAccountService
     {
         var role = NormalizeRole(dto.Role);
         if (!IsStaffRole(role))
-            throw new InvalidOperationException("Role must be Admin");
+            throw new InvalidOperationException("Role must be Admin or Employee");
+
+        var screenPermissions = ResolveScreenPermissions(role, dto.ScreenPermissions, requireExisting: true);
 
         PasswordPolicy.EnsureStrong(dto.Password);
 
@@ -37,7 +54,8 @@ public class UserAccountService
         {
             Username = dto.Username.Trim(),
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = role
+            Role = role,
+            ScreenPermissionsJson = SerializeScreenPermissions(screenPermissions)
         };
 
         await _userRepo.AddAsync(user);
@@ -96,7 +114,18 @@ public class UserAccountService
             changed = true;
         }
 
+        if (dto.ScreenPermissions != null)
+        {
+            changed = true;
+        }
+
         if (!changed) throw new InvalidOperationException("No updatable field supplied");
+
+        var screenPermissions = ResolveScreenPermissions(
+            user.Role,
+            dto.ScreenPermissions,
+            requireExisting: user.Role.Equals("Employee", StringComparison.OrdinalIgnoreCase) && dto.Role is not null);
+        user.ScreenPermissionsJson = SerializeScreenPermissions(screenPermissions);
 
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepo.UpdateAsync(user);
@@ -137,6 +166,7 @@ public class UserAccountService
         return role.Trim().ToLowerInvariant() switch
         {
             "admin" => "Admin",
+            "employee" => "Employee",
             "ownerclient" => "OwnerClient",
             _ => role.Trim()
         };
@@ -155,6 +185,7 @@ public class UserAccountService
             Id = user.Id,
             Username = user.Username,
             Role = user.Role,
+            ScreenPermissions = DeserializeScreenPermissions(user.ScreenPermissionsJson),
             OwnerId = owner?.Id,
             OwnerFullName = owner?.FullName,
             CreatedAt = user.CreatedAt
@@ -162,9 +193,65 @@ public class UserAccountService
     }
 
     private static bool IsStaffRole(string role)
-        => role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+        => role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+            || role.Equals("Employee", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsKnownRole(string role)
         => role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
+            || role.Equals("Employee", StringComparison.OrdinalIgnoreCase)
             || role.Equals("OwnerClient", StringComparison.OrdinalIgnoreCase);
+
+    private static List<string> ResolveScreenPermissions(string role, IEnumerable<string>? permissions, bool requireExisting)
+    {
+        if (!role.Equals("Employee", StringComparison.OrdinalIgnoreCase))
+        {
+            if (permissions != null && permissions.Any(p => !string.IsNullOrWhiteSpace(p)))
+                throw new InvalidOperationException("Screen permissions can only be set for Employee users");
+
+            return [];
+        }
+
+        var normalized = NormalizeScreenPermissions(permissions);
+        if (normalized.Count == 0)
+        {
+            if (requireExisting || permissions != null)
+                throw new InvalidOperationException("Employee users must have at least one visible screen");
+
+            return [];
+        }
+
+        var invalid = normalized.FirstOrDefault(p => !EmployeeVisibleScreens.Contains(p));
+        if (!string.IsNullOrWhiteSpace(invalid))
+            throw new InvalidOperationException($"Unknown screen permission '{invalid}'");
+
+        return normalized;
+    }
+
+    private static List<string> NormalizeScreenPermissions(IEnumerable<string>? permissions)
+    {
+        if (permissions == null) return [];
+
+        return permissions
+            .Select(p => p?.Trim())
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList()!;
+    }
+
+    private static string SerializeScreenPermissions(IEnumerable<string> permissions)
+        => JsonSerializer.Serialize(permissions.ToList());
+
+    private static List<string> DeserializeScreenPermissions(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return [];
+
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+    }
 }

@@ -552,6 +552,11 @@ namespace PropertyManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ScreenPermissionsJson")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasDefaultValue("[]");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
