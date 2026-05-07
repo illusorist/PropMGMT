@@ -22,7 +22,8 @@ public class UserAccountService
         "/app/payments",
         "/app/buyers",
         "/app/sales",
-        "/app/leads"
+        "/app/leads",
+        "/app/requests"
     };
 
     private readonly IUserRepository _userRepo;

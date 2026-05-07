@@ -94,7 +94,7 @@ public class PropertiesController : ControllerBase
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, PropertyStatusUpdateDto dto)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         await _service.UpdateStatusAsync(id, dto.Status);
         return NoContent();
     }

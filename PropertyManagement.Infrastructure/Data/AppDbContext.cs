@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<RequestRecord> Requests => Set<RequestRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,6 +40,8 @@ public class AppDbContext : DbContext
             .Property(p => p.SalePrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Property>()
             .Property(p => p.RentPrice).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<RequestRecord>()
+            .Property(r => r.MaxBudget).HasColumnType("numeric(18,2)");
 
         modelBuilder.Entity<Contract>()
             .Property(c => c.Status).HasConversion<string>();
@@ -61,6 +64,13 @@ public class AppDbContext : DbContext
             .IsRequired()
             .HasColumnType("text")
             .HasDefaultValue("[]");
+
+        modelBuilder.Entity<RequestRecord>()
+            .Property(r => r.FullName).IsRequired();
+        modelBuilder.Entity<RequestRecord>()
+            .Property(r => r.MobileNumber).IsRequired();
+        modelBuilder.Entity<RequestRecord>()
+            .Property(r => r.RequestType).IsRequired();
 
         modelBuilder.Entity<Amenity>()
             .Property(a => a.Name).IsRequired();
@@ -97,6 +107,12 @@ public class AppDbContext : DbContext
             .HasIndex(i => i.LeadId);
         modelBuilder.Entity<LeadImage>()
             .HasIndex(i => new { i.LeadId, i.SortOrder });
+
+        modelBuilder.Entity<Tenant>()
+            .HasOne(t => t.Property)
+            .WithMany()
+            .HasForeignKey(t => t.PropertyId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<PropertyAmenity>()
             .HasKey(pa => new { pa.PropertyId, pa.AmenityId });

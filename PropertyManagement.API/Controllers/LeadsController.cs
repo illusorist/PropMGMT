@@ -47,7 +47,7 @@ public class LeadsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] LeadIntent? intent, [FromQuery] LeadStatus? status)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         return Ok(await _service.GetAllAsync(intent, status));
     }
 
@@ -55,7 +55,7 @@ public class LeadsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         var lead = await _service.GetByIdAsync(id);
         return lead == null ? NotFound() : Ok(lead);
     }
@@ -64,7 +64,7 @@ public class LeadsController : ControllerBase
     [HttpGet("{id}/images/{imageId:int}/file")]
     public async Task<IActionResult> GetImageFile(int id, int imageId)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         var image = await _service.GetImageFileAsync(id, imageId);
         return File(image.Stream, image.ContentType, image.FileName);
     }
@@ -73,7 +73,7 @@ public class LeadsController : ControllerBase
     [HttpPost("{id}/approve")]
     public async Task<IActionResult> Approve(int id)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         var propertyId = await _service.ApproveAsync(id);
         return Ok(new { propertyId });
     }
@@ -82,7 +82,7 @@ public class LeadsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, LeadUpdateDto dto)
     {
-        if (!User.IsAdmin()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }

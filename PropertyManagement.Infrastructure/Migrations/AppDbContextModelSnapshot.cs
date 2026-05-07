@@ -137,6 +137,78 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.ToTable("Contracts");
                 });
 
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.RequestRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BedroomCount")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Employee")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("MaxBudget")
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("MobileNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Profession")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RequestDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RequestType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Via")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Requests");
+                });
+
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Lead", b =>
                 {
                     b.Property<int>("Id")
@@ -510,6 +582,9 @@ namespace PropertyManagement.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("PropertyId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -533,6 +608,8 @@ namespace PropertyManagement.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
 
                     b.ToTable("Tenants");
                 });
@@ -590,6 +667,16 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.Navigation("Property");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.Tenant", b =>
+                {
+                    b.HasOne("PropertyManagement.Domain.Entities.Property", "Property")
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Lead", b =>

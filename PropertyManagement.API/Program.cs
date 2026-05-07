@@ -22,6 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.Configure<PropertyImageUploadOptions>(builder.Configuration.GetSection("PropertyImageUpload"));
 builder.Services.Configure<LeadImageUploadOptions>(builder.Configuration.GetSection("LeadImageUpload"));
+builder.Services.Configure<RequestsIngestionOptions>(builder.Configuration.GetSection("Integrations:Requests"));
 
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
@@ -37,6 +38,7 @@ builder.Services.AddScoped<ITenantRepository, TenantRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRequestRecordRepository, RequestRecordRepository>();
 
 builder.Services.AddScoped<OwnerService>();
 builder.Services.AddScoped<OwnerAccountService>();
@@ -52,6 +54,7 @@ builder.Services.AddScoped<ContractService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserAccountService>();
+builder.Services.AddScoped<RequestIngestionService>();
 builder.Services.AddScoped<BootstrapAdminInitializer>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
