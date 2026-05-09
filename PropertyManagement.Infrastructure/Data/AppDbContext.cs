@@ -23,6 +23,8 @@ public class AppDbContext : DbContext
     public DbSet<Contract> Contracts => Set<Contract>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<RequestRecord> Requests => Set<RequestRecord>();
+    public DbSet<CommercialListing> CommercialListings => Set<CommercialListing>();
+    public DbSet<ResidentialSeeker> ResidentialSeekers => Set<ResidentialSeeker>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +73,80 @@ public class AppDbContext : DbContext
             .Property(r => r.MobileNumber).IsRequired();
         modelBuilder.Entity<RequestRecord>()
             .Property(r => r.RequestType).IsRequired();
+
+        modelBuilder.Entity<CommercialListing>(entity =>
+        {
+            entity.ToTable("commercial_listings");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.RowFlag).HasColumnName("row_flag").HasColumnType("text");
+            entity.Property(e => e.SerialNumber).HasColumnName("serial_number").HasColumnType("text");
+            entity.Property(e => e.ContactDate).HasColumnName("contact_date").HasColumnType("text");
+            entity.Property(e => e.PropertyStatus).HasColumnName("property_status").HasColumnType("text");
+            entity.Property(e => e.BrokerageContract).HasColumnName("brokerage_contract").HasColumnType("text");
+            entity.Property(e => e.LicenseNumber).HasColumnName("license_number").HasColumnType("text");
+            entity.Property(e => e.ContractExpiry).HasColumnName("contract_expiry").HasColumnType("text");
+            entity.Property(e => e.AdNumber).HasColumnName("ad_number").HasColumnType("text");
+            entity.Property(e => e.Employee).HasColumnName("employee").HasColumnType("text");
+            entity.Property(e => e.Broker).HasColumnName("broker").HasColumnType("text");
+            entity.Property(e => e.OwnerName).HasColumnName("owner_name").HasColumnType("text");
+            entity.Property(e => e.Mobile1).HasColumnName("mobile1").HasColumnType("text");
+            entity.Property(e => e.Mobile2).HasColumnName("mobile2").HasColumnType("text");
+            entity.Property(e => e.AvailableUnits).HasColumnName("available_units").HasColumnType("text");
+            entity.Property(e => e.DeedNumber).HasColumnName("deed_number").HasColumnType("text");
+            entity.Property(e => e.PropertyType).HasColumnName("property_type").HasColumnType("text");
+            entity.Property(e => e.RoomsCount).HasColumnName("rooms_count").HasColumnType("text");
+            entity.Property(e => e.BuildingAge).HasColumnName("building_age").HasColumnType("text");
+            entity.Property(e => e.HasElevator).HasColumnName("has_elevator").HasColumnType("text");
+            entity.Property(e => e.OtherDetails).HasColumnName("other_details").HasColumnType("text");
+            entity.Property(e => e.RentAmount).HasColumnName("rent_amount").HasColumnType("text");
+            entity.Property(e => e.PaymentType).HasColumnName("payment_type").HasColumnType("text");
+            entity.Property(e => e.Location).HasColumnName("location").HasColumnType("text");
+            entity.Property(e => e.Coordinates).HasColumnName("coordinates").HasColumnType("text");
+            entity.Property(e => e.HasKey).HasColumnName("has_key").HasColumnType("text");
+            entity.Property(e => e.PublishedTahmid).HasColumnName("published_tahmid").HasColumnType("text");
+            entity.Property(e => e.PublishedBoard).HasColumnName("published_board").HasColumnType("text");
+            entity.Property(e => e.PublishedDesigns).HasColumnName("published_designs").HasColumnType("text");
+            entity.Property(e => e.PublishedHaraj).HasColumnName("published_haraj").HasColumnType("text");
+            entity.Property(e => e.PublishedDeal).HasColumnName("published_deal").HasColumnType("text");
+            entity.Property(e => e.PublishedAqar).HasColumnName("published_aqar").HasColumnType("text");
+            entity.Property(e => e.PublishedBayut).HasColumnName("published_bayut").HasColumnType("text");
+            entity.Property(e => e.PublishedDhaki).HasColumnName("published_dhaki").HasColumnType("text");
+            entity.Property(e => e.PublishedWhatsapp).HasColumnName("published_whatsapp").HasColumnType("text");
+            entity.Property(e => e.PublishedTwitter).HasColumnName("published_twitter").HasColumnType("text");
+            entity.Property(e => e.PublishedWhatsappGroup).HasColumnName("published_whatsapp_group").HasColumnType("text");
+            entity.Property(e => e.PublishedWhatsappChannel).HasColumnName("published_whatsapp_channel").HasColumnType("text");
+            entity.Property(e => e.PublishedSnapchat).HasColumnName("published_snapchat").HasColumnType("text");
+            entity.Property(e => e.PublishedX).HasColumnName("published_x").HasColumnType("text");
+            entity.Property(e => e.PublishedInstagram).HasColumnName("published_instagram").HasColumnType("text");
+            entity.Property(e => e.PublishedTiktok).HasColumnName("published_tiktok").HasColumnType("text");
+            entity.Property(e => e.Notes).HasColumnName("notes").HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamp with time zone");
+        });
+
+        modelBuilder.Entity<ResidentialSeeker>(entity =>
+        {
+            entity.ToTable("residential_seekers");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.SerialNumber).HasColumnName("serial_number").HasColumnType("text");
+            entity.Property(e => e.RequestDate).HasColumnName("request_date").HasColumnType("text");
+            entity.Property(e => e.Status).HasColumnName("status").HasColumnType("text");
+            entity.Property(e => e.Employee).HasColumnName("employee").HasColumnType("text");
+            entity.Property(e => e.Receiver).HasColumnName("receiver").HasColumnType("text");
+            entity.Property(e => e.SourceChannel).HasColumnName("source_channel").HasColumnType("text");
+            entity.Property(e => e.Mobile).HasColumnName("mobile").HasColumnType("text");
+            entity.Property(e => e.FullName).HasColumnName("full_name").HasColumnType("text");
+            entity.Property(e => e.Nationality).HasColumnName("nationality").HasColumnType("text");
+            entity.Property(e => e.Profession).HasColumnName("profession").HasColumnType("text");
+            entity.Property(e => e.FamilyCount).HasColumnName("family_count").HasColumnType("text");
+            entity.Property(e => e.RequestDescription).HasColumnName("request_description").HasColumnType("text");
+            entity.Property(e => e.MaxBudget).HasColumnName("max_budget").HasColumnType("text");
+            entity.Property(e => e.PaymentType).HasColumnName("payment_type").HasColumnType("text");
+            entity.Property(e => e.PreferredLocation).HasColumnName("preferred_location").HasColumnType("text");
+            entity.Property(e => e.Notes).HasColumnName("notes").HasColumnType("text");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamp with time zone");
+        });
 
         modelBuilder.Entity<Amenity>()
             .Property(a => a.Name).IsRequired();

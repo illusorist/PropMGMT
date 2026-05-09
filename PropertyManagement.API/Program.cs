@@ -39,6 +39,8 @@ builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRequestRecordRepository, RequestRecordRepository>();
+builder.Services.AddScoped<ICommercialListingRepository, CommercialListingRepository>();
+builder.Services.AddScoped<IResidentialSeekerRepository, ResidentialSeekerRepository>();
 
 builder.Services.AddScoped<OwnerService>();
 builder.Services.AddScoped<OwnerAccountService>();
@@ -55,6 +57,8 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserAccountService>();
 builder.Services.AddScoped<RequestIngestionService>();
+builder.Services.AddScoped<CommercialListingService>();
+builder.Services.AddScoped<ResidentialSeekerService>();
 builder.Services.AddScoped<BootstrapAdminInitializer>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;

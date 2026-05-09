@@ -209,6 +209,282 @@ namespace PropertyManagement.Infrastructure.Migrations
                     b.ToTable("Requests");
                 });
 
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.CommercialListing", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("RowFlag")
+                        .HasColumnType("text")
+                        .HasColumnName("row_flag");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("serial_number");
+
+                    b.Property<string>("ContactDate")
+                        .HasColumnType("text")
+                        .HasColumnName("contact_date");
+
+                    b.Property<string>("PropertyStatus")
+                        .HasColumnType("text")
+                        .HasColumnName("property_status");
+
+                    b.Property<string>("BrokerageContract")
+                        .HasColumnType("text")
+                        .HasColumnName("brokerage_contract");
+
+                    b.Property<string>("LicenseNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("license_number");
+
+                    b.Property<string>("ContractExpiry")
+                        .HasColumnType("text")
+                        .HasColumnName("contract_expiry");
+
+                    b.Property<string>("AdNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("ad_number");
+
+                    b.Property<string>("Employee")
+                        .HasColumnType("text")
+                        .HasColumnName("employee");
+
+                    b.Property<string>("Broker")
+                        .HasColumnType("text")
+                        .HasColumnName("broker");
+
+                    b.Property<string>("OwnerName")
+                        .HasColumnType("text")
+                        .HasColumnName("owner_name");
+
+                    b.Property<string>("Mobile1")
+                        .HasColumnType("text")
+                        .HasColumnName("mobile1");
+
+                    b.Property<string>("Mobile2")
+                        .HasColumnType("text")
+                        .HasColumnName("mobile2");
+
+                    b.Property<string>("AvailableUnits")
+                        .HasColumnType("text")
+                        .HasColumnName("available_units");
+
+                    b.Property<string>("DeedNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("deed_number");
+
+                    b.Property<string>("PropertyType")
+                        .HasColumnType("text")
+                        .HasColumnName("property_type");
+
+                    b.Property<string>("RoomsCount")
+                        .HasColumnType("text")
+                        .HasColumnName("rooms_count");
+
+                    b.Property<string>("BuildingAge")
+                        .HasColumnType("text")
+                        .HasColumnName("building_age");
+
+                    b.Property<string>("HasElevator")
+                        .HasColumnType("text")
+                        .HasColumnName("has_elevator");
+
+                    b.Property<string>("OtherDetails")
+                        .HasColumnType("text")
+                        .HasColumnName("other_details");
+
+                    b.Property<string>("RentAmount")
+                        .HasColumnType("text")
+                        .HasColumnName("rent_amount");
+
+                    b.Property<string>("PaymentType")
+                        .HasColumnType("text")
+                        .HasColumnName("payment_type");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text")
+                        .HasColumnName("location");
+
+                    b.Property<string>("Coordinates")
+                        .HasColumnType("text")
+                        .HasColumnName("coordinates");
+
+                    b.Property<string>("HasKey")
+                        .HasColumnType("text")
+                        .HasColumnName("has_key");
+
+                    b.Property<string>("PublishedTahmid")
+                        .HasColumnType("text")
+                        .HasColumnName("published_tahmid");
+
+                    b.Property<string>("PublishedBoard")
+                        .HasColumnType("text")
+                        .HasColumnName("published_board");
+
+                    b.Property<string>("PublishedDesigns")
+                        .HasColumnType("text")
+                        .HasColumnName("published_designs");
+
+                    b.Property<string>("PublishedHaraj")
+                        .HasColumnType("text")
+                        .HasColumnName("published_haraj");
+
+                    b.Property<string>("PublishedDeal")
+                        .HasColumnType("text")
+                        .HasColumnName("published_deal");
+
+                    b.Property<string>("PublishedAqar")
+                        .HasColumnType("text")
+                        .HasColumnName("published_aqar");
+
+                    b.Property<string>("PublishedBayut")
+                        .HasColumnType("text")
+                        .HasColumnName("published_bayut");
+
+                    b.Property<string>("PublishedDhaki")
+                        .HasColumnType("text")
+                        .HasColumnName("published_dhaki");
+
+                    b.Property<string>("PublishedWhatsapp")
+                        .HasColumnType("text")
+                        .HasColumnName("published_whatsapp");
+
+                    b.Property<string>("PublishedTwitter")
+                        .HasColumnType("text")
+                        .HasColumnName("published_twitter");
+
+                    b.Property<string>("PublishedWhatsappGroup")
+                        .HasColumnType("text")
+                        .HasColumnName("published_whatsapp_group");
+
+                    b.Property<string>("PublishedWhatsappChannel")
+                        .HasColumnType("text")
+                        .HasColumnName("published_whatsapp_channel");
+
+                    b.Property<string>("PublishedSnapchat")
+                        .HasColumnType("text")
+                        .HasColumnName("published_snapchat");
+
+                    b.Property<string>("PublishedX")
+                        .HasColumnType("text")
+                        .HasColumnName("published_x");
+
+                    b.Property<string>("PublishedInstagram")
+                        .HasColumnType("text")
+                        .HasColumnName("published_instagram");
+
+                    b.Property<string>("PublishedTiktok")
+                        .HasColumnType("text")
+                        .HasColumnName("published_tiktok");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("commercial_listings");
+                });
+
+            modelBuilder.Entity("PropertyManagement.Domain.Entities.ResidentialSeeker", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("serial_number");
+
+                    b.Property<string>("RequestDate")
+                        .HasColumnType("text")
+                        .HasColumnName("request_date");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Employee")
+                        .HasColumnType("text")
+                        .HasColumnName("employee");
+
+                    b.Property<string>("Receiver")
+                        .HasColumnType("text")
+                        .HasColumnName("receiver");
+
+                    b.Property<string>("SourceChannel")
+                        .HasColumnType("text")
+                        .HasColumnName("source_channel");
+
+                    b.Property<string>("Mobile")
+                        .HasColumnType("text")
+                        .HasColumnName("mobile");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("text")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("Nationality")
+                        .HasColumnType("text")
+                        .HasColumnName("nationality");
+
+                    b.Property<string>("Profession")
+                        .HasColumnType("text")
+                        .HasColumnName("profession");
+
+                    b.Property<string>("FamilyCount")
+                        .HasColumnType("text")
+                        .HasColumnName("family_count");
+
+                    b.Property<string>("RequestDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("request_description");
+
+                    b.Property<string>("MaxBudget")
+                        .HasColumnType("text")
+                        .HasColumnName("max_budget");
+
+                    b.Property<string>("PaymentType")
+                        .HasColumnType("text")
+                        .HasColumnName("payment_type");
+
+                    b.Property<string>("PreferredLocation")
+                        .HasColumnType("text")
+                        .HasColumnName("preferred_location");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("residential_seekers");
+                });
+
             modelBuilder.Entity("PropertyManagement.Domain.Entities.Lead", b =>
                 {
                     b.Property<int>("Id")
