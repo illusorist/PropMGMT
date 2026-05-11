@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -12,8 +13,17 @@ public static class UserClaimsExtensions
         return int.TryParse(value, out var id) ? id : null;
     }
 
+    public static Guid? GetPartnerId(this ClaimsPrincipal user)
+    {
+        var value = user.FindFirstValue("partner_id");
+        return Guid.TryParse(value, out var id) ? id : null;
+    }
+
     public static bool IsOwnerClient(this ClaimsPrincipal user)
         => user.IsInRole("OwnerClient");
+
+    public static bool IsPartner(this ClaimsPrincipal user)
+        => user.IsInRole("Partner");
 
     public static bool IsStaff(this ClaimsPrincipal user)
         => user.IsInRole("Admin") || user.IsInRole("Employee");

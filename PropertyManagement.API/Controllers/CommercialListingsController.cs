@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PropertyManagement.API.Auth;
 using PropertyManagement.Application.DTOs.CommercialListing;
+using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Application.Services;
 
 namespace PropertyManagement.API.Controllers;
@@ -14,15 +15,29 @@ public class CommercialListingsController : ControllerBase
 {
     private const string ScreenPath = "/app/commercial-listings";
     private readonly CommercialListingService _service;
+    private readonly IPartnerRepository _partnerRepository;
 
-    public CommercialListingsController(CommercialListingService service)
+    public CommercialListingsController(CommercialListingService service, IPartnerRepository partnerRepository)
     {
         _service = service;
+        _partnerRepository = partnerRepository;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] CommercialListingSearchQueryDto query)
     {
+        if (User.IsPartner())
+        {
+            var partnerId = User.GetPartnerId();
+            if (!partnerId.HasValue) return Forbid();
+
+            var partner = await _partnerRepository.GetByIdAsync(partnerId.Value);
+            if (partner == null || string.IsNullOrWhiteSpace(partner.FullName)) return Forbid();
+
+            var resultForPartner = await _service.SearchAsync(query, partner.FullName);
+            return Ok(resultForPartner);
+        }
+
         if (!User.IsOwnerClient() && !CanView()) return Forbid();
         var result = await _service.SearchAsync(query);
         return Ok(result);
@@ -31,6 +46,23 @@ public class CommercialListingsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
+        if (User.IsPartner())
+        {
+            var partnerId = User.GetPartnerId();
+            if (!partnerId.HasValue) return Forbid();
+
+            var partner = await _partnerRepository.GetByIdAsync(partnerId.Value);
+            if (partner == null || string.IsNullOrWhiteSpace(partner.FullName)) return Forbid();
+
+            var itemForPartner = await _service.GetByIdAsync(id);
+            if (itemForPartner == null) return NotFound();
+
+            if (!string.Equals(itemForPartner.Broker?.Trim(), partner.FullName.Trim(), System.StringComparison.OrdinalIgnoreCase))
+                return Forbid();
+
+            return Ok(itemForPartner);
+        }
+
         if (!User.IsOwnerClient() && !CanView()) return Forbid();
         var item = await _service.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);

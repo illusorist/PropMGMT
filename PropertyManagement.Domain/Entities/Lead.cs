@@ -20,8 +20,13 @@ public class Lead : BaseEntity
     public DateTime? PreferredContactAt { get; set; }
     public DateTime? LastContactedAt { get; set; }
     public int? AssignedToUserId { get; set; }
+    public Guid? PartnerId { get; set; }
+    public decimal? CommissionAmount { get; set; }
+    public string? CommissionStatus { get; set; }
+    public string? CommissionNotes { get; set; }
 
     public Property? Property { get; set; }
     public User? AssignedToUser { get; set; }
+    public Partner? Partner { get; set; }
     public ICollection<LeadImage> Images { get; set; } = new List<LeadImage>();
 }

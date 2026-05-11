@@ -169,6 +169,7 @@ public class UserAccountService
             "admin" => "Admin",
             "employee" => "Employee",
             "ownerclient" => "OwnerClient",
+            "partner" => "Partner",
             _ => role.Trim()
         };
     }
@@ -200,7 +201,8 @@ public class UserAccountService
     private static bool IsKnownRole(string role)
         => role.Equals("Admin", StringComparison.OrdinalIgnoreCase)
             || role.Equals("Employee", StringComparison.OrdinalIgnoreCase)
-            || role.Equals("OwnerClient", StringComparison.OrdinalIgnoreCase);
+            || role.Equals("OwnerClient", StringComparison.OrdinalIgnoreCase)
+            || role.Equals("Partner", StringComparison.OrdinalIgnoreCase);
 
     private static List<string> ResolveScreenPermissions(string role, IEnumerable<string>? permissions, bool requireExisting)
     {

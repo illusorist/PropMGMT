@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Owner> Owners => Set<Owner>();
+    public DbSet<Partner> Partners => Set<Partner>();
     public DbSet<Property> Properties => Set<Property>();
     public DbSet<PropertyImage> PropertyImages => Set<PropertyImage>();
     public DbSet<Lead> Leads => Set<Lead>();
@@ -38,6 +39,8 @@ public class AppDbContext : DbContext
             .Property(p => p.Amount).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Lead>()
             .Property(l => l.ListedPrice).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.CommissionAmount).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Property>()
             .Property(p => p.SalePrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Property>()
@@ -209,6 +212,19 @@ public class AppDbContext : DbContext
             .HasIndex(o => o.UserId)
             .IsUnique();
 
+        modelBuilder.Entity<Partner>()
+            .ToTable("partners");
+        modelBuilder.Entity<Partner>()
+            .Property(p => p.FullName)
+            .IsRequired();
+        modelBuilder.Entity<Partner>()
+            .HasOne(p => p.User)
+            .WithOne()
+            .HasForeignKey<Partner>(p => p.UserId);
+        modelBuilder.Entity<Partner>()
+            .HasIndex(p => p.UserId)
+            .IsUnique();
+
         modelBuilder.Entity<PropertySale>()
             .HasOne(s => s.Property)
             .WithMany(p => p.Sales)
@@ -233,6 +249,11 @@ public class AppDbContext : DbContext
             .HasOne(l => l.AssignedToUser)
             .WithMany()
             .HasForeignKey(l => l.AssignedToUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<Lead>()
+            .HasOne(l => l.Partner)
+            .WithMany(p => p.Leads)
+            .HasForeignKey(l => l.PartnerId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<LeadImage>()

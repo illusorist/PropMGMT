@@ -17,12 +17,13 @@ public class CommercialListingService
         _repo = repo;
     }
 
-    public async Task<CommercialListingSearchResultDto> SearchAsync(CommercialListingSearchQueryDto query)
+    public async Task<CommercialListingSearchResultDto> SearchAsync(CommercialListingSearchQueryDto query, string? broker = null)
     {
         var (items, total) = await _repo.SearchAsync(
             query.Q,
             query.Status,
             query.Employee,
+            broker,
             query.Page,
             query.PageSize,
             query.SortBy,

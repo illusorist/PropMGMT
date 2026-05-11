@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using PropertyManagement.Application.DTOs.Lead;
+using PropertyManagement.Application.DTOs.Partner;
 using PropertyManagement.Application.Interfaces;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Domain.Enums;
@@ -21,6 +22,7 @@ public class LeadService
     private readonly IPropertyImageStorage _propertyImageStorage;
     private readonly IOwnerRepository _ownerRepo;
     private readonly IUserRepository _userRepo;
+    private readonly IPartnerRepository _partnerRepo;
 
     public LeadService(
         ILeadRepository leadRepo,
@@ -30,7 +32,8 @@ public class LeadService
         IPropertyImageRepository propertyImageRepo,
         IPropertyImageStorage propertyImageStorage,
         IOwnerRepository ownerRepo,
-        IUserRepository userRepo)
+        IUserRepository userRepo,
+        IPartnerRepository partnerRepo)
     {
         _leadRepo = leadRepo;
         _leadImageRepo = leadImageRepo;
@@ -40,6 +43,7 @@ public class LeadService
         _propertyImageStorage = propertyImageStorage;
         _ownerRepo = ownerRepo;
         _userRepo = userRepo;
+        _partnerRepo = partnerRepo;
     }
 
     public async Task<int> CreatePublicAsync(LeadCreateDto dto)
@@ -71,6 +75,33 @@ public class LeadService
     {
         var lead = await _leadRepo.GetByIdWithDetailsAndImagesAsync(id);
         return lead == null ? null : MapLead(lead);
+    }
+
+    public async Task<int> CreatePartnerLeadAsync(SubmitPartnerLeadDto dto, Guid partnerId)
+    {
+        ValidatePartnerLeadInput(dto.PropertyName, dto.Address, dto.Type, dto.ListedPrice);
+
+        var partner = await _partnerRepo.GetByIdAsync(partnerId)
+            ?? throw new KeyNotFoundException($"Partner {partnerId} not found");
+
+        var lead = new Lead
+        {
+            PropertyName = dto.PropertyName,
+            PropertyAddress = dto.Address,
+            PropertyType = dto.Type,
+            OwnerNationalId = string.IsNullOrWhiteSpace(partner.NationalId) ? partner.Id.ToString() : partner.NationalId,
+            FullName = partner.FullName,
+            Phone = partner.Phone ?? string.Empty,
+            Email = partner.Email ?? string.Empty,
+            Notes = dto.Notes ?? string.Empty,
+            Intent = dto.Intent,
+            ListedPrice = dto.ListedPrice,
+            Status = LeadStatus.New,
+            PartnerId = partner.Id
+        };
+
+        await _leadRepo.AddAsync(lead);
+        return lead.Id;
     }
 
     public async Task<LeadImageResponseDto> AddImageAsync(
@@ -113,6 +144,12 @@ public class LeadService
     public async Task<List<LeadResponseDto>> GetAllAsync(LeadIntent? intent, LeadStatus? status)
     {
         var leads = await _leadRepo.GetAllWithDetailsAsync(intent, status);
+        return leads.Select(MapLead).ToList();
+    }
+
+    public async Task<List<LeadResponseDto>> GetAllForPartnerAsync(Guid partnerId)
+    {
+        var leads = await _leadRepo.GetAllByPartnerIdAsync(partnerId);
         return leads.Select(MapLead).ToList();
     }
 
@@ -286,6 +323,9 @@ public class LeadService
         lead.ListedPrice = dto.ListedPrice;
         lead.LastContactedAt = NormalizeUtc(dto.LastContactedAt);
         lead.PreferredContactAt = NormalizeUtc(dto.PreferredContactAt);
+        lead.CommissionAmount = dto.CommissionAmount;
+        lead.CommissionStatus = dto.CommissionStatus;
+        lead.CommissionNotes = dto.CommissionNotes;
         lead.UpdatedAt = DateTime.UtcNow;
 
         await _leadRepo.UpdateAsync(lead);
@@ -312,6 +352,11 @@ public class LeadService
             LastContactedAt = lead.LastContactedAt,
             AssignedToUserId = lead.AssignedToUserId,
             AssignedToUsername = lead.AssignedToUser?.Username,
+            PartnerId = lead.PartnerId,
+            PartnerName = lead.Partner?.FullName,
+            CommissionAmount = lead.CommissionAmount,
+            CommissionStatus = lead.CommissionStatus,
+            CommissionNotes = lead.CommissionNotes,
             Images = lead.Images.OrderBy(i => i.SortOrder).ThenBy(i => i.Id).Select(MapLeadImage).ToList(),
             CreatedAt = lead.CreatedAt
         };
@@ -342,6 +387,14 @@ public class LeadService
         if (string.IsNullOrWhiteSpace(fullName)) throw new ArgumentException("Contact name is required.");
         if (string.IsNullOrWhiteSpace(phone)) throw new ArgumentException("Phone is required.");
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email is required.");
+        if (listedPrice <= 0) throw new ArgumentException("Listed price must be greater than zero.");
+    }
+
+    private static void ValidatePartnerLeadInput(string propertyName, string propertyAddress, string propertyType, decimal listedPrice)
+    {
+        if (string.IsNullOrWhiteSpace(propertyName)) throw new ArgumentException("Property name is required.");
+        if (string.IsNullOrWhiteSpace(propertyAddress)) throw new ArgumentException("Property address is required.");
+        if (string.IsNullOrWhiteSpace(propertyType)) throw new ArgumentException("Property type is required.");
         if (listedPrice <= 0) throw new ArgumentException("Listed price must be greater than zero.");
     }
 

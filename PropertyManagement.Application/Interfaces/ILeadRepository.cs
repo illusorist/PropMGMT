@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using PropertyManagement.Domain.Entities;
 using PropertyManagement.Domain.Enums;
+using System;
 
 namespace PropertyManagement.Application.Interfaces;
 
@@ -11,6 +12,7 @@ public interface ILeadRepository
     Task<Lead?> GetByIdWithDetailsAsync(int id);
     Task<List<Lead>> GetAllWithDetailsAsync(LeadIntent? intent, LeadStatus? status);
     Task<Lead?> GetByIdWithDetailsAndImagesAsync(int id);
+    Task<List<Lead>> GetAllByPartnerIdAsync(Guid partnerId);
     Task AddAsync(Lead lead);
     Task UpdateAsync(Lead lead);
     Task DeleteAsync(int id);

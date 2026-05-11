@@ -23,6 +23,11 @@ public class LeadResponseDto
     public DateTime? LastContactedAt { get; set; }
     public int? AssignedToUserId { get; set; }
     public string? AssignedToUsername { get; set; }
+    public Guid? PartnerId { get; set; }
+    public string? PartnerName { get; set; }
+    public decimal? CommissionAmount { get; set; }
+    public string? CommissionStatus { get; set; }
+    public string? CommissionNotes { get; set; }
     public List<LeadImageResponseDto> Images { get; set; } = new();
     public DateTime CreatedAt { get; set; }
 }

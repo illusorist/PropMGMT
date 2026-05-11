@@ -17,6 +17,7 @@ public class CommercialListingRepository : BaseRepository<CommercialListing>, IC
         string? q,
         string? status,
         string? employee,
+        string? broker,
         int page,
         int pageSize,
         string? sortBy,
@@ -46,6 +47,12 @@ public class CommercialListingRepository : BaseRepository<CommercialListing>, IC
         {
             var like = $"%{employee.Trim()}%";
             query = query.Where(r => EF.Functions.ILike(r.Employee, like));
+        }
+
+        if (!string.IsNullOrWhiteSpace(broker))
+        {
+            var brokerName = broker.Trim();
+            query = query.Where(r => r.Broker != null && EF.Functions.ILike(r.Broker!, brokerName));
         }
 
         var sortKey = (sortBy ?? string.Empty).Trim().ToLowerInvariant().Replace("_", string.Empty);

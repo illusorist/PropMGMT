@@ -14,6 +14,7 @@ public interface ICommercialListingRepository
         string? q,
         string? status,
         string? employee,
+        string? broker,
         int page,
         int pageSize,
         string? sortBy,

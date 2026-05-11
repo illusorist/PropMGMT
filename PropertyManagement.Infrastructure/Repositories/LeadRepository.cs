@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
         return await _db.Leads
             .Include(l => l.Property)
             .Include(l => l.AssignedToUser)
+            .Include(l => l.Partner)
             .Include(l => l.Images)
             .FirstOrDefaultAsync(l => l.Id == id);
     }
@@ -27,6 +29,7 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
         return await _db.Leads
             .Include(l => l.Property)
             .Include(l => l.AssignedToUser)
+            .Include(l => l.Partner)
             .Include(l => l.Images)
             .FirstOrDefaultAsync(l => l.Id == id);
     }
@@ -36,6 +39,7 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
         var query = _db.Leads
             .Include(l => l.Property)
             .Include(l => l.AssignedToUser)
+            .Include(l => l.Partner)
             .Include(l => l.Images)
             .AsQueryable();
 
@@ -46,6 +50,18 @@ public class LeadRepository : BaseRepository<Lead>, ILeadRepository
             query = query.Where(l => l.Status == status.Value);
 
         return await query
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<Lead>> GetAllByPartnerIdAsync(Guid partnerId)
+    {
+        return await _db.Leads
+            .Include(l => l.Property)
+            .Include(l => l.AssignedToUser)
+            .Include(l => l.Partner)
+            .Include(l => l.Images)
+            .Where(l => l.PartnerId == partnerId)
             .OrderByDescending(l => l.CreatedAt)
             .ToListAsync();
     }

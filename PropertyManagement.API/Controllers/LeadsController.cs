@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PropertyManagement.API.Auth;
 using PropertyManagement.Application.DTOs.Lead;
+using PropertyManagement.Application.DTOs.Partner;
 using PropertyManagement.Application.Services;
 using PropertyManagement.Domain.Enums;
 
@@ -43,10 +44,40 @@ public class LeadsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = leadId }, lead);
     }
 
+    [Authorize(Roles = "Partner")]
+    [HttpPost("submit-partner")]
+    [RequestFormLimits(MultipartBodyLengthLimit = 20_000_000)]
+    public async Task<IActionResult> SubmitPartner([FromForm] SubmitPartnerLeadDto dto, [FromForm] List<IFormFile>? images, CancellationToken cancellationToken)
+    {
+        var partnerId = User.GetPartnerId();
+        if (!partnerId.HasValue) return Forbid();
+
+        var leadId = await _service.CreatePartnerLeadAsync(dto, partnerId.Value);
+
+        if (images != null)
+        {
+            foreach (var file in images)
+            {
+                if (file == null || file.Length == 0) continue;
+                await using var stream = file.OpenReadStream();
+                await _service.AddImageAsync(leadId, stream, file.FileName, file.ContentType, file.Length, cancellationToken);
+            }
+        }
+
+        var lead = await _service.GetByIdAsync(leadId);
+        return CreatedAtAction(nameof(GetById), new { id = leadId }, lead);
+    }
+
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] LeadIntent? intent, [FromQuery] LeadStatus? status)
     {
+        if (User.IsPartner())
+        {
+            var partnerId = User.GetPartnerId();
+            if (!partnerId.HasValue) return Forbid();
+            return Ok(await _service.GetAllForPartnerAsync(partnerId.Value));
+        }
         if (!User.IsStaff()) return Forbid();
         return Ok(await _service.GetAllAsync(intent, status));
     }
@@ -55,9 +86,17 @@ public class LeadsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (!User.IsStaff()) return Forbid();
+        if (!User.IsStaff() && !User.IsPartner()) return Forbid();
         var lead = await _service.GetByIdAsync(id);
-        return lead == null ? NotFound() : Ok(lead);
+        if (lead == null) return NotFound();
+
+        if (User.IsPartner())
+        {
+            var partnerId = User.GetPartnerId();
+            if (!partnerId.HasValue || lead.PartnerId != partnerId.Value) return Forbid();
+        }
+
+        return Ok(lead);
     }
 
     [Authorize]

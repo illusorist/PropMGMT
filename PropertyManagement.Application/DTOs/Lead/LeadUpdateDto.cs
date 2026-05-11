@@ -11,4 +11,7 @@ public class LeadUpdateDto
     public decimal ListedPrice { get; set; }
     public DateTime? LastContactedAt { get; set; }
     public DateTime? PreferredContactAt { get; set; }
+    public decimal? CommissionAmount { get; set; }
+    public string? CommissionStatus { get; set; }
+    public string? CommissionNotes { get; set; }
 }

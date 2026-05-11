@@ -25,6 +25,7 @@ builder.Services.Configure<LeadImageUploadOptions>(builder.Configuration.GetSect
 builder.Services.Configure<RequestsIngestionOptions>(builder.Configuration.GetSection("Integrations:Requests"));
 
 builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
+builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 builder.Services.AddScoped<IPropertyImageRepository, PropertyImageRepository>();
 builder.Services.AddScoped<IPropertyImageStorage, DiskPropertyImageStorage>();
@@ -43,6 +44,7 @@ builder.Services.AddScoped<ICommercialListingRepository, CommercialListingReposi
 builder.Services.AddScoped<IResidentialSeekerRepository, ResidentialSeekerRepository>();
 
 builder.Services.AddScoped<OwnerService>();
+builder.Services.AddScoped<PartnerService>();
 builder.Services.AddScoped<OwnerAccountService>();
 builder.Services.AddScoped<OwnerStatsService>();
 builder.Services.AddScoped<PropertyService>();
@@ -112,9 +114,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:8080")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>();
+
+policy.WithOrigins(allowedOrigins!)
+        .AllowAnyHeader()
+        .AllowAnyMethod();
         });
 });
 

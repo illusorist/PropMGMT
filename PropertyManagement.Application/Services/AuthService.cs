@@ -17,12 +17,14 @@ public class AuthService
 {
     private readonly IUserRepository _userRepo;
     private readonly IOwnerRepository _ownerRepo;
+    private readonly IPartnerRepository _partnerRepo;
     private readonly IConfiguration _config;
 
-    public AuthService(IUserRepository userRepo, IOwnerRepository ownerRepo, IConfiguration config)
+    public AuthService(IUserRepository userRepo, IOwnerRepository ownerRepo, IPartnerRepository partnerRepo, IConfiguration config)
     {
         _userRepo = userRepo;
         _ownerRepo = ownerRepo;
+        _partnerRepo = partnerRepo;
         _config = config;
     }
 
@@ -33,11 +35,14 @@ public class AuthService
             return null;
 
         var owner = await _ownerRepo.GetByUserIdAsync(user.Id);
-        var token = GenerateToken(user, owner?.Id);
+        var partner = user.Role.Equals("Partner", StringComparison.OrdinalIgnoreCase)
+            ? await _partnerRepo.GetByUserIdAsync(user.Id)
+            : null;
+        var token = GenerateToken(user, owner?.Id, partner?.Id);
         return new AuthResponseDto { Token = token, Username = user.Username, Role = user.Role, ScreenPermissions = ReadScreenPermissions(user) };
     }
 
-    private string GenerateToken(User user, int? ownerId)
+    private string GenerateToken(User user, int? ownerId, Guid? partnerId)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -52,11 +57,15 @@ public class AuthService
         {
             claims.Add(new Claim("owner_id", ownerId.Value.ToString()));
         }
+        if (partnerId.HasValue)
+        {
+            claims.Add(new Claim("partner_id", partnerId.Value.ToString()));
+        }
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
             audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddHours(12),
             signingCredentials: creds
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
