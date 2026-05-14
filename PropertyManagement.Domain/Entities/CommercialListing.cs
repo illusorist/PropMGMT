@@ -44,4 +44,5 @@ public class CommercialListing : BaseEntity
     public string? PublishedInstagram { get; set; }
     public string? PublishedTiktok { get; set; }
     public string? Notes { get; set; }
+    public string? ComplianceNumber { get; set; }
 }

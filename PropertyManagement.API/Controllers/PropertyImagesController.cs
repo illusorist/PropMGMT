@@ -24,7 +24,7 @@ public class PropertyImagesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll(int propertyId)
     {
-        if (!TryGetOwnerScope(out var ownerId, out var error)) return error!;
+        if (!TryGetAccess(out var ownerId, out var error)) return error!;
         return Ok(await _service.GetByPropertyIdAsync(propertyId, ownerId));
     }
 
@@ -33,7 +33,7 @@ public class PropertyImagesController : ControllerBase
     public async Task<IActionResult> Upload(int propertyId, [FromForm] IFormFile file, [FromForm] bool isPrimary = false, [FromForm] int? sortOrder = null, CancellationToken cancellationToken = default)
     {
         if (file == null) return BadRequest("File is required");
-        if (!TryGetOwnerScope(out var ownerId, out var error)) return error!;
+        if (!TryGetAccess(out var ownerId, out var error)) return error!;
         await using var stream = file.OpenReadStream();
         var image = await _service.UploadAsync(
             propertyId,
@@ -52,7 +52,7 @@ public class PropertyImagesController : ControllerBase
     [HttpDelete("{imageId:int}")]
     public async Task<IActionResult> Delete(int propertyId, int imageId, CancellationToken cancellationToken = default)
     {
-        if (!TryGetOwnerScope(out var ownerId, out var error)) return error!;
+        if (!TryGetAccess(out var ownerId, out var error)) return error!;
         await _service.DeleteAsync(propertyId, imageId, ownerId, cancellationToken);
         return NoContent();
     }
@@ -60,7 +60,7 @@ public class PropertyImagesController : ControllerBase
     [HttpPut("{imageId:int}/primary")]
     public async Task<IActionResult> SetPrimary(int propertyId, int imageId)
     {
-        if (!TryGetOwnerScope(out var ownerId, out var error)) return error!;
+        if (!TryGetAccess(out var ownerId, out var error)) return error!;
         await _service.SetPrimaryAsync(propertyId, imageId, ownerId);
         return NoContent();
     }
@@ -68,27 +68,14 @@ public class PropertyImagesController : ControllerBase
     [HttpPut("reorder")]
     public async Task<IActionResult> Reorder(int propertyId, PropertyImageReorderDto dto)
     {
-        if (!TryGetOwnerScope(out var ownerId, out var error)) return error!;
+        if (!TryGetAccess(out var ownerId, out var error)) return error!;
         await _service.ReorderAsync(propertyId, dto, ownerId);
         return NoContent();
     }
 
-    private bool TryGetOwnerScope(out int? ownerId, out IActionResult? error)
+    private bool TryGetAccess(out int? ownerId, out IActionResult? error)
     {
-        if (User.IsOwnerClient())
-        {
-            ownerId = User.GetOwnerId();
-            if (!ownerId.HasValue)
-            {
-                error = Forbid();
-                return false;
-            }
-
-            error = null;
-            return true;
-        }
-
-        if (!User.IsStaff())
+        if (!User.IsPartner() && !User.IsStaff())
         {
             ownerId = null;
             error = Forbid();

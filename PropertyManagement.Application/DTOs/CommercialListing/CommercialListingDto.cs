@@ -47,6 +47,7 @@ public class CommercialListingDto
     public string? PublishedInstagram { get; set; }
     public string? PublishedTiktok { get; set; }
     public string? Notes { get; set; }
+    public string? ComplianceNumber { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

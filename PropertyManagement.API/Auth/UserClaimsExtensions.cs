@@ -19,9 +19,6 @@ public static class UserClaimsExtensions
         return Guid.TryParse(value, out var id) ? id : null;
     }
 
-    public static bool IsOwnerClient(this ClaimsPrincipal user)
-        => user.IsInRole("OwnerClient");
-
     public static bool IsPartner(this ClaimsPrincipal user)
         => user.IsInRole("Partner");
 

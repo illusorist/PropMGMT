@@ -13,12 +13,14 @@ public class PropertySaleService
     private readonly IPropertySaleRepository _saleRepo;
     private readonly IPropertyRepository _propertyRepo;
     private readonly IBuyerClientRepository _buyerRepo;
+    private readonly IContractRepository _contractRepo;
 
-    public PropertySaleService(IPropertySaleRepository saleRepo, IPropertyRepository propertyRepo, IBuyerClientRepository buyerRepo)
+    public PropertySaleService(IPropertySaleRepository saleRepo, IPropertyRepository propertyRepo, IBuyerClientRepository buyerRepo, IContractRepository contractRepo)
     {
         _saleRepo = saleRepo;
         _propertyRepo = propertyRepo;
         _buyerRepo = buyerRepo;
+        _contractRepo = contractRepo;
     }
 
     public async Task<List<SaleResponseDto>> GetAllAsync()
@@ -69,6 +71,15 @@ public class PropertySaleService
         property.Status = PropertyStatus.Sold;
         property.UpdatedAt = System.DateTime.UtcNow;
         await _propertyRepo.UpdateAsync(property);
+
+        // Terminate all active contracts on the sold property
+        var activeContracts = await _contractRepo.GetAllByPropertyIdAsync(dto.PropertyId);
+        foreach (var contract in activeContracts.Where(c => c.Status == ContractStatus.Active))
+        {
+            contract.Status = ContractStatus.Terminated;
+            contract.UpdatedAt = System.DateTime.UtcNow;
+            await _contractRepo.UpdateAsync(contract);
+        }
     }
 
     private static SaleResponseDto Map(PropertySale sale)

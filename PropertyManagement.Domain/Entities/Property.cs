@@ -11,6 +11,7 @@ public class Property : BaseEntity
     public string Type { get; set; } = string.Empty;
     public decimal? SalePrice { get; set; }
     public decimal? RentPrice { get; set; }
+    public string? ComplianceNumber { get; set; }
     public PropertyStatus Status { get; set; } = PropertyStatus.Pending;
 
     public Owner Owner { get; set; } = null!;

@@ -38,6 +38,7 @@ public class AuthService
         var partner = user.Role.Equals("Partner", StringComparison.OrdinalIgnoreCase)
             ? await _partnerRepo.GetByUserIdAsync(user.Id)
             : null;
+
         var token = GenerateToken(user, owner?.Id, partner?.Id);
         return new AuthResponseDto { Token = token, Username = user.Username, Role = user.Role, ScreenPermissions = ReadScreenPermissions(user) };
     }

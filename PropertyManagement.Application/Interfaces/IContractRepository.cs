@@ -11,6 +11,7 @@ public interface IContractRepository
     Task<Contract?> GetByIdByOwnerIdAsync(int ownerId, int id);
     Task<List<Contract>> GetAllAsync();
     Task<List<Contract>> GetAllByOwnerIdAsync(int ownerId);
+    Task<List<Contract>> GetAllByPropertyIdAsync(int propertyId);
     Task<int> CountByOwnerAsync(int ownerId);
     Task<int> CountByOwnerAndStatusAsync(int ownerId, ContractStatus status);
     Task AddAsync(Contract contract);

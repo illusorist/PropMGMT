@@ -23,7 +23,7 @@ public class ResidentialSeekersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] ResidentialSeekerSearchQueryDto query)
     {
-        if (!User.IsOwnerClient() && !CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var result = await _service.SearchAsync(query);
         return Ok(result);
     }
@@ -31,7 +31,7 @@ public class ResidentialSeekersController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (!User.IsOwnerClient() && !CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var item = await _service.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);
     }
@@ -39,8 +39,7 @@ public class ResidentialSeekersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(ResidentialSeekerUpsertDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
-        if (!CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var created = await _service.CreateAsync(dto);
         return Ok(created);
     }
@@ -48,8 +47,7 @@ public class ResidentialSeekersController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, ResidentialSeekerUpsertDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
-        if (!CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var updated = await _service.UpdateAsync(id, dto);
         return Ok(updated);
     }

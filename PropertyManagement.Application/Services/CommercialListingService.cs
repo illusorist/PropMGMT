@@ -92,7 +92,8 @@ public class CommercialListingService
             PublishedX = TrimValue(dto.PublishedX),
             PublishedInstagram = TrimValue(dto.PublishedInstagram),
             PublishedTiktok = TrimValue(dto.PublishedTiktok),
-            Notes = TrimValue(dto.Notes)
+            Notes = TrimValue(dto.Notes),
+            ComplianceNumber = TrimValue(dto.ComplianceNumber)
         };
 
         await _repo.AddAsync(entity);
@@ -146,6 +147,7 @@ public class CommercialListingService
         ApplyIfProvided(dto.PublishedInstagram, v => entity.PublishedInstagram = v);
         ApplyIfProvided(dto.PublishedTiktok, v => entity.PublishedTiktok = v);
         ApplyIfProvided(dto.Notes, v => entity.Notes = v);
+        ApplyIfProvided(dto.ComplianceNumber, v => entity.ComplianceNumber = v);
 
         entity.UpdatedAt = DateTime.UtcNow;
         await _repo.UpdateAsync(entity);
@@ -209,6 +211,7 @@ public class CommercialListingService
             PublishedInstagram = entity.PublishedInstagram,
             PublishedTiktok = entity.PublishedTiktok,
             Notes = entity.Notes,
+            ComplianceNumber = entity.ComplianceNumber,
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt
         };

@@ -35,6 +35,7 @@ public class PropertyService
             Type = p.Type,
             SalePrice = p.SalePrice,
             RentPrice = p.RentPrice,
+            ComplianceNumber = p.ComplianceNumber,
             PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
@@ -54,8 +55,9 @@ public class PropertyService
             Address = p.Address,
             Type = p.Type,
             SalePrice = p.SalePrice,
-            RentPrice = p.RentPrice,
-            PrimaryImageUrl = GetPrimaryImageUrl(p),
+                RentPrice = p.RentPrice,
+                ComplianceNumber = p.ComplianceNumber,
+                PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
@@ -73,8 +75,9 @@ public class PropertyService
             Address = p.Address,
             Type = p.Type,
             SalePrice = p.SalePrice,
-            RentPrice = p.RentPrice,
-            PrimaryImageUrl = GetPrimaryImageUrl(p),
+                RentPrice = p.RentPrice,
+                ComplianceNumber = p.ComplianceNumber,
+                PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
             Amenities = MapAmenities(p)
@@ -145,6 +148,7 @@ public class PropertyService
             Address = dto.Address,
             Type = dto.Type,
             SalePrice = dto.SalePrice,
+            ComplianceNumber = dto.ComplianceNumber,
             RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
@@ -166,6 +170,7 @@ public class PropertyService
             Address = dto.Address,
             Type = dto.Type,
             SalePrice = dto.SalePrice,
+            ComplianceNumber = dto.ComplianceNumber,
             RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
@@ -186,6 +191,7 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
+        property.ComplianceNumber = dto.ComplianceNumber;
         property.SalePrice = dto.SalePrice;
         property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;
@@ -210,6 +216,7 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
+        property.ComplianceNumber = dto.ComplianceNumber;
         property.SalePrice = dto.SalePrice;
         property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;

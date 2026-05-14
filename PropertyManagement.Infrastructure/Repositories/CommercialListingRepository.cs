@@ -52,7 +52,7 @@ public class CommercialListingRepository : BaseRepository<CommercialListing>, IC
         if (!string.IsNullOrWhiteSpace(broker))
         {
             var brokerName = broker.Trim();
-            query = query.Where(r => r.Broker != null && EF.Functions.ILike(r.Broker!, brokerName));
+            query = query.Where(r => r.Broker != null && EF.Functions.ILike(r.Broker, brokerName));
         }
 
         var sortKey = (sortBy ?? string.Empty).Trim().ToLowerInvariant().Replace("_", string.Empty);

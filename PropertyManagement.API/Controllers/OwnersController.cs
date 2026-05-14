@@ -26,18 +26,14 @@ public class OwnersController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        if (User.IsOwnerClient()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (User.IsOwnerClient())
-        {
-            var ownerId = User.GetOwnerId();
-            if (!ownerId.HasValue || ownerId.Value != id) return Forbid();
-        }
+        if (!User.IsStaff()) return Forbid();
         var owner = await _service.GetByIdAsync(id);
         return owner == null ? NotFound() : Ok(owner);
     }
@@ -45,7 +41,7 @@ public class OwnersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(OwnerCreateDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         await _service.CreateAsync(dto);
         return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
     }
@@ -53,11 +49,7 @@ public class OwnersController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, OwnerCreateDto dto)
     {
-        if (User.IsOwnerClient())
-        {
-            var ownerId = User.GetOwnerId();
-            if (!ownerId.HasValue || ownerId.Value != id) return Forbid();
-        }
+        if (!User.IsStaff()) return Forbid();
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }
@@ -65,7 +57,7 @@ public class OwnersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        if (User.IsOwnerClient()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         await _service.DeleteAsync(id);
         return NoContent();
     }
@@ -81,12 +73,7 @@ public class OwnersController : ControllerBase
     [HttpGet("{id}/stats")]
     public async Task<IActionResult> GetStats(int id)
     {
-        if (User.IsOwnerClient())
-        {
-            var ownerId = User.GetOwnerId();
-            if (!ownerId.HasValue || ownerId.Value != id) return Forbid();
-        }
-        if (!User.IsOwnerClient() && !User.IsStaff()) return Forbid();
+        if (!User.IsStaff()) return Forbid();
         return Ok(await _statsService.GetStatsAsync(id));
     }
 }

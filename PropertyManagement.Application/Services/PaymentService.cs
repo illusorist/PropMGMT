@@ -75,7 +75,7 @@ public class PaymentService
         };
     }
 
-    public async Task CreateAsync(PaymentCreateDto dto)
+    public async Task<PaymentResponseDto> CreateAsync(PaymentCreateDto dto)
     {
         var payment = new Payment
         {
@@ -86,6 +86,17 @@ public class PaymentService
             Status = dto.Status
         };
         await _repo.AddAsync(payment);
+
+        return new PaymentResponseDto
+        {
+            Id = payment.Id,
+            ContractId = payment.ContractId,
+            DueDate = payment.DueDate,
+            PaidDate = payment.PaidDate,
+            Amount = payment.Amount,
+            Status = payment.Status,
+            CreatedAt = payment.CreatedAt
+        };
     }
 
     public async Task UpdateAsync(int id, PaymentCreateDto dto)

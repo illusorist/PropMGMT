@@ -12,32 +12,37 @@ namespace PropertyManagement.API.Controllers;
 [Route("api/[controller]")]
 public class PaymentsController : ControllerBase
 {
+    private const string ScreenPath = "/app/payments";
     private readonly PaymentService _service;
+
     public PaymentsController(PaymentService service) => _service = service;
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        if (User.IsOwnerClient())
+        if (User.IsPartner())
         {
             var ownerId = User.GetOwnerId();
             if (!ownerId.HasValue) return Forbid();
             return Ok(await _service.GetAllForOwnerAsync(ownerId.Value));
         }
+
+        if (!CanView()) return Forbid();
         return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        if (User.IsOwnerClient())
+        if (User.IsPartner())
         {
             var ownerId = User.GetOwnerId();
             if (!ownerId.HasValue) return Forbid();
-            var ownerPayment = await _service.GetByIdForOwnerAsync(ownerId.Value, id);
-            return ownerPayment == null ? NotFound() : Ok(ownerPayment);
+            var paymentForOwner = await _service.GetByIdForOwnerAsync(ownerId.Value, id);
+            return paymentForOwner == null ? NotFound() : Ok(paymentForOwner);
         }
 
+        if (!CanView()) return Forbid();
         var payment = await _service.GetByIdAsync(id);
         return payment == null ? NotFound() : Ok(payment);
     }
@@ -45,15 +50,15 @@ public class PaymentsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(PaymentCreateDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
-        await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = 0 }, null);
+        if (!CanView()) return Forbid();
+        var created = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, PaymentCreateDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
+        if (!CanView()) return Forbid();
         await _service.UpdateAsync(id, dto);
         return NoContent();
     }
@@ -61,8 +66,14 @@ public class PaymentsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        if (User.IsOwnerClient()) return Forbid();
+        if (!CanView()) return Forbid();
         await _service.DeleteAsync(id);
         return NoContent();
+    }
+
+    private bool CanView()
+    {
+        if (User.IsAdmin()) return true;
+        return User.IsStaff() && User.HasScreenPermission(ScreenPath);
     }
 }

@@ -27,6 +27,13 @@ public class ContractRepository : BaseRepository<Contract>, IContractRepository
             .ToListAsync();
     }
 
+    public async Task<List<Contract>> GetAllByPropertyIdAsync(int propertyId)
+    {
+        return await _db.Contracts
+            .Where(c => c.PropertyId == propertyId)
+            .ToListAsync();
+    }
+
     public async Task<int> CountByOwnerAsync(int ownerId)
         => await _db.Contracts.CountAsync(c => c.Property.OwnerId == ownerId);
 

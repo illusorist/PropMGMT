@@ -94,14 +94,14 @@ public class TenantService
 
     public async Task DeleteAsync(int id) => await _repo.DeleteAsync(id);
 
-    private async Task<int> ResolvePropertyIdAsync(int? propertyId)
+    private async Task<int> ResolvePropertyIdAsync(int propertyId)
     {
-        if (!propertyId.HasValue || propertyId.Value <= 0)
+        if (propertyId <= 0)
             throw new InvalidOperationException("Property is required");
 
-        var property = await _propertyRepo.GetByIdAsync(propertyId.Value);
+            var property = await _propertyRepo.GetByIdAsync(propertyId);
         if (property == null)
-            throw new KeyNotFoundException($"Property {propertyId.Value} not found");
+                throw new KeyNotFoundException($"Property {propertyId} not found");
 
         return property.Id;
     }

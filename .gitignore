@@ -147,3 +147,4 @@ secrets.json
 ## Misc
 Misc/
 uploads/
+cleanup_demo_db.sql

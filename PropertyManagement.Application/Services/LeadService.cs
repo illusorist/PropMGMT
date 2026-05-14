@@ -84,12 +84,16 @@ public class LeadService
         var partner = await _partnerRepo.GetByIdAsync(partnerId)
             ?? throw new KeyNotFoundException($"Partner {partnerId} not found");
 
+        // Require partner to have a valid national ID to prevent garbage owner records
+        if (string.IsNullOrWhiteSpace(partner.NationalId))
+            throw new InvalidOperationException("Partner account must have a national ID set before submitting leads.");
+
         var lead = new Lead
         {
             PropertyName = dto.PropertyName,
             PropertyAddress = dto.Address,
             PropertyType = dto.Type,
-            OwnerNationalId = string.IsNullOrWhiteSpace(partner.NationalId) ? partner.Id.ToString() : partner.NationalId,
+            OwnerNationalId = partner.NationalId,
             FullName = partner.FullName,
             Phone = partner.Phone ?? string.Empty,
             Email = partner.Email ?? string.Empty,
@@ -202,11 +206,33 @@ public class LeadService
             }
             else
             {
-                owner.FullName = lead.FullName;
-                owner.Phone = lead.Phone;
-                owner.Email = lead.Email;
-                owner.UpdatedAt = DateTime.UtcNow;
-                await _ownerRepo.UpdateAsync(owner);
+                var ownerChanged = false;
+
+                // Do not overwrite existing owner contact info from lead submitter data.
+                // Only backfill fields that are currently empty.
+                if (string.IsNullOrWhiteSpace(owner.FullName) && !string.IsNullOrWhiteSpace(lead.FullName))
+                {
+                    owner.FullName = lead.FullName;
+                    ownerChanged = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(owner.Phone) && !string.IsNullOrWhiteSpace(lead.Phone))
+                {
+                    owner.Phone = lead.Phone;
+                    ownerChanged = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(owner.Email) && !string.IsNullOrWhiteSpace(lead.Email))
+                {
+                    owner.Email = lead.Email;
+                    ownerChanged = true;
+                }
+
+                if (ownerChanged)
+                {
+                    owner.UpdatedAt = DateTime.UtcNow;
+                    await _ownerRepo.UpdateAsync(owner);
+                }
             }
 
             var property = new Property

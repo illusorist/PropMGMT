@@ -38,7 +38,7 @@ public class CommercialListingsController : ControllerBase
             return Ok(resultForPartner);
         }
 
-        if (!User.IsOwnerClient() && !CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var result = await _service.SearchAsync(query);
         return Ok(result);
     }
@@ -63,7 +63,7 @@ public class CommercialListingsController : ControllerBase
             return Ok(itemForPartner);
         }
 
-        if (!User.IsOwnerClient() && !CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var item = await _service.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);
     }
@@ -71,8 +71,7 @@ public class CommercialListingsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CommercialListingUpsertDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
-        if (!CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var created = await _service.CreateAsync(dto);
         return Ok(created);
     }
@@ -80,8 +79,7 @@ public class CommercialListingsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, CommercialListingUpsertDto dto)
     {
-        if (User.IsOwnerClient()) return Forbid();
-        if (!CanView()) return Forbid();
+        if (!User.IsPartner() && !CanView()) return Forbid();
         var updated = await _service.UpdateAsync(id, dto);
         return Ok(updated);
     }

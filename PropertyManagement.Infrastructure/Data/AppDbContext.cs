@@ -45,6 +45,8 @@ public class AppDbContext : DbContext
             .Property(p => p.SalePrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Property>()
             .Property(p => p.RentPrice).HasColumnType("numeric(18,2)");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.ComplianceNumber).HasColumnName("compliance_number").HasColumnType("text");
         modelBuilder.Entity<RequestRecord>()
             .Property(r => r.MaxBudget).HasColumnType("numeric(18,2)");
 
@@ -123,6 +125,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.PublishedInstagram).HasColumnName("published_instagram").HasColumnType("text");
             entity.Property(e => e.PublishedTiktok).HasColumnName("published_tiktok").HasColumnType("text");
             entity.Property(e => e.Notes).HasColumnName("notes").HasColumnType("text");
+            entity.Property(e => e.ComplianceNumber).HasColumnName("compliance_number").HasColumnType("text");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("timestamp with time zone");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at").HasColumnType("timestamp with time zone");
         });
