@@ -46,7 +46,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Property>()
             .Property(p => p.RentPrice).HasColumnType("numeric(18,2)");
         modelBuilder.Entity<Property>()
-            .Property(p => p.ComplianceNumber).HasColumnName("compliance_number").HasColumnType("text");
+            .Property(p => p.DeedNumber).HasColumnName("deed_number").HasColumnType("text");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.Region).HasColumnName("region").HasColumnType("text");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.City).HasColumnName("city").HasColumnType("text");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.District).HasColumnName("district").HasColumnType("text");
+        modelBuilder.Entity<Property>()
+            .Property(p => p.ListingType).HasColumnName("listing_type").HasColumnType("text").HasDefaultValue("Rental");
         modelBuilder.Entity<RequestRecord>()
             .Property(r => r.MaxBudget).HasColumnType("numeric(18,2)");
 

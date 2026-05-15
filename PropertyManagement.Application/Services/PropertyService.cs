@@ -33,9 +33,13 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Region = p.Region,
+            City = p.City,
+            District = p.District,
+            ListingType = p.ListingType,
             SalePrice = p.SalePrice,
             RentPrice = p.RentPrice,
-            ComplianceNumber = p.ComplianceNumber,
+            DeedNumber = p.DeedNumber,
             PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
@@ -54,9 +58,13 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Region = p.Region,
+            City = p.City,
+            District = p.District,
+            ListingType = p.ListingType,
             SalePrice = p.SalePrice,
                 RentPrice = p.RentPrice,
-                ComplianceNumber = p.ComplianceNumber,
+                DeedNumber = p.DeedNumber,
                 PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
@@ -74,9 +82,13 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Region = p.Region,
+            City = p.City,
+            District = p.District,
+            ListingType = p.ListingType,
             SalePrice = p.SalePrice,
                 RentPrice = p.RentPrice,
-                ComplianceNumber = p.ComplianceNumber,
+                DeedNumber = p.DeedNumber,
                 PrimaryImageUrl = GetPrimaryImageUrl(p),
             Status = p.Status,
             CreatedAt = p.CreatedAt,
@@ -95,6 +107,10 @@ public class PropertyService
             Name = p.Name,
             Address = p.Address,
             Type = p.Type,
+            Region = p.Region,
+            City = p.City,
+            District = p.District,
+            ListingType = p.ListingType,
             SalePrice = p.SalePrice,
             RentPrice = p.RentPrice,
             PrimaryImageUrl = GetPrimaryImageUrl(p),
@@ -147,8 +163,12 @@ public class PropertyService
             Name = dto.Name,
             Address = dto.Address,
             Type = dto.Type,
+            Region = dto.Region,
+            City = dto.City,
+            District = dto.District,
+            ListingType = dto.ListingType,
             SalePrice = dto.SalePrice,
-            ComplianceNumber = dto.ComplianceNumber,
+            DeedNumber = dto.DeedNumber,
             RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
@@ -169,8 +189,12 @@ public class PropertyService
             Name = dto.Name,
             Address = dto.Address,
             Type = dto.Type,
+            Region = dto.Region,
+            City = dto.City,
+            District = dto.District,
+            ListingType = dto.ListingType,
             SalePrice = dto.SalePrice,
-            ComplianceNumber = dto.ComplianceNumber,
+            DeedNumber = dto.DeedNumber,
             RentPrice = dto.RentPrice,
             PropertyAmenities = amenityIds.Select(id => new PropertyAmenity
             {
@@ -191,7 +215,11 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
-        property.ComplianceNumber = dto.ComplianceNumber;
+        property.Region = dto.Region;
+        property.City = dto.City;
+        property.District = dto.District;
+        property.ListingType = dto.ListingType;
+        property.DeedNumber = dto.DeedNumber;
         property.SalePrice = dto.SalePrice;
         property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;
@@ -216,7 +244,11 @@ public class PropertyService
         property.Name = dto.Name;
         property.Address = dto.Address;
         property.Type = dto.Type;
-        property.ComplianceNumber = dto.ComplianceNumber;
+        property.Region = dto.Region;
+        property.City = dto.City;
+        property.District = dto.District;
+        property.ListingType = dto.ListingType;
+        property.DeedNumber = dto.DeedNumber;
         property.SalePrice = dto.SalePrice;
         property.RentPrice = dto.RentPrice;
         property.UpdatedAt = DateTime.UtcNow;

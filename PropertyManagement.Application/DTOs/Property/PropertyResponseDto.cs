@@ -11,9 +11,13 @@ public class PropertyResponseDto
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+    public string? Region { get; set; }
+    public string? City { get; set; }
+    public string? District { get; set; }
+    public string ListingType { get; set; } = "Rental";
     public decimal? SalePrice { get; set; }
     public decimal? RentPrice { get; set; }
-    public string? ComplianceNumber { get; set; }
+    public string? DeedNumber { get; set; }
     public string? PrimaryImageUrl { get; set; }
     public PropertyStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
